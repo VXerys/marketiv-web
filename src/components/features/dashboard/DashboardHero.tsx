@@ -13,74 +13,68 @@ export function DashboardHero({
   searchPlaceholder,
 }: DashboardHeroProps) {
   return (
-    <section className="relative w-full h-[480px] md:h-[550px] flex items-center justify-center overflow-hidden">
+    <section className="relative w-full h-[320px] sm:h-[380px] md:h-[450px] lg:h-[434px] flex flex-col items-center justify-center overflow-hidden pt-20 md:pt-24 lg:pt-28 pb-6 lg:pb-8">
       {/* Background Image */}
       <Image
         src={landingPageBg}
         alt="Background banner"
         fill
         priority
-        className="object-cover object-center"
+        className="object-cover object-[center_35%]"
         sizes="100vw"
-        quality={85}
+        quality={100}
       />
 
-      {/* Gradient Overlay (Figma: Linear, 41% #FF8C00/20%, 50% #F8F40B/20%) */}
+      {/* Gradient Overlay Matching Figma */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(135deg, rgba(255,140,0,0.20) 41%, rgba(248,244,11,0.20) 50%)",
+            "linear-gradient(238deg, rgba(248, 244, 11, 0.2) 41%, rgba(255, 140, 0, 0.2) 50%)",
         }}
       />
 
-      {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-brand-overlay" />
-
       {/* Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-10 flex flex-col items-start text-left">
-        <h1 className="text-white font-bold text-3xl md:text-5xl lg:text-6xl drop-shadow-md leading-tight max-w-4xl">
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 flex flex-col items-center text-center">
+        {/* Headline */}
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[42px] font-bold text-white drop-shadow-lg leading-tight capitalize max-w-4xl whitespace-pre-line">
           {title}
         </h1>
-        <p className="text-hero-subtitle text-white/90 mt-4 max-w-2xl text-lg md:text-xl">
+        
+        {/* Subtitle */}
+        <p className="text-sm sm:text-base md:text-lg font-medium text-white/95 mt-3 sm:mt-4 max-w-2xl lg:max-w-3xl drop-shadow-md">
           {subtitle}
         </p>
  
         {/* Search Bar */}
-        <div className="mt-8 w-full max-w-5xl flex items-center bg-white rounded-2xl md:rounded-full overflow-hidden shadow-2xl">
-          <div className="pl-6 text-text-muted">
+        <div className="mt-5 sm:mt-6 md:mt-8 w-full max-w-2xl lg:max-w-3xl xl:max-w-4xl flex items-center bg-white rounded-[30px] overflow-hidden shadow-2xl h-12 sm:h-12 md:h-14 lg:h-[60px]">
+          <div className="pl-5 md:pl-6 text-[#cbc6c6] flex items-center justify-center">
             <svg
-              className="w-6 h-6"
+              className="w-5 h-5 md:w-6 md:h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              strokeWidth={2}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
+              <circle cx="11" cy="11" r="8" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35" />
             </svg>
           </div>
           <input
             type="text"
             placeholder={searchPlaceholder}
-            className="flex-1 px-4 py-4 md:py-5 text-lg text-text-main outline-none bg-transparent placeholder:text-text-muted"
+            className="flex-1 px-3 md:px-4 text-sm md:text-base lg:text-lg font-semibold text-text-main outline-none bg-transparent placeholder:text-[#cbc6c6] capitalize"
           />
-          <button className="bg-brand-coral hover:bg-brand-coral/90 text-white px-8 py-4 md:py-5 transition-colors cursor-pointer flex items-center justify-center">
+          <button className="bg-brand-coral hover:bg-brand-coral/90 text-white px-5 md:px-[26px] lg:px-[33px] h-full transition-colors cursor-pointer flex items-center justify-center shrink-0">
             <svg
-              className="w-6 h-6"
+              className="w-5 h-5 md:w-6 md:h-6"
               fill="none"
-              stroke="currentColor"
+              stroke="white"
               viewBox="0 0 24 24"
+              strokeWidth={3}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
+              <circle cx="11" cy="11" r="8" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35" />
             </svg>
           </button>
         </div>

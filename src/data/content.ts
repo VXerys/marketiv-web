@@ -9,7 +9,7 @@ export const NAVBAR_CONTENT = {
 
 export const LANDING_CONTENT = {
   hero: {
-    title: "Kolaborasi Hebat, Bisnis Melesat",
+    title: "Kolaborasi Hebat, Bisnis\nMelesat",
     subtitle: "Platform Penghubung UMKM Dan Konten Kreator Untuk Promosi Produk Yang Lebih Berdampak",
     ctaUmkm: "Saya Pemilik UMKM",
     ctaCreator: "Saya Konten Kreator",
@@ -20,8 +20,8 @@ export const LANDING_CONTENT = {
 export const UMKM_CONTENT = {
   hero: {
     title: "Temukan Kolaborasi Bisnis Impianmu",
-    subtitle: "Jelajahi campaign dan Konten Kreator untuk Promosi Produk yang Lebih Berdampak",
-    searchPlaceholder: "Search Campaign...",
+    subtitle: "Jelajahi berbagai campaign konten kreator untuk promosi produk yang lebih berdampak",
+    searchPlaceholder: "Cari Campaign.........",
   },
   grid: {
     title: "Temuan Campaign UMKM",

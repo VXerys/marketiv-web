@@ -12,7 +12,14 @@ export function Navbar() {
   const navLinks = NAVBAR_CONTENT.links;
 
   return (
-    <nav className="absolute inset-x-0 top-0 z-50 w-full">
+    <nav
+      className={cn(
+        "absolute inset-x-0 top-0 z-50 w-full transition-colors duration-300",
+        isMobileMenuOpen
+          ? "bg-brand-dark/95 backdrop-blur-md md:bg-transparent md:backdrop-blur-none"
+          : "bg-transparent"
+      )}
+    >
       <div className="mx-auto flex w-full max-w-7xl items-center px-6 py-6 md:px-12 md:py-10 lg:px-16">
         {/* Logo (left-aligned) */}
         <div className="flex-1">
@@ -27,7 +34,7 @@ export function Navbar() {
             <li key={link.href}>
               <Link
                 href={link.href}
-                className="text-white/90 transition-colors duration-200 hover:text-white"
+                className="text-nav-link text-white/90 transition-colors duration-200 hover:text-white"
               >
                 {link.label}
               </Link>
@@ -35,16 +42,8 @@ export function Navbar() {
           ))}
         </ul>
 
-        {/* Right side CTA / Mobile Toggle */}
+        {/* Right side Mobile Toggle */}
         <div className="flex flex-1 justify-end items-center gap-4">
-          <div className="hidden lg:flex items-center gap-3">
-            <Button variant="soft" size="sm" href="/creator" className="px-6">
-              CREATOR
-            </Button>
-            <Button variant="primary" size="sm" href="/umkm" className="px-6">
-              UMKM
-            </Button>
-          </div>
 
           <button
             className="flex cursor-pointer flex-col gap-1.5 p-2 md:hidden"
@@ -75,11 +74,11 @@ export function Navbar() {
 
       <div
         className={cn(
-          "bg-brand-dark/95 overflow-hidden backdrop-blur-md transition-all duration-300 md:hidden",
-          isMobileMenuOpen ? "max-h-64 opacity-100" : "max-h-0 opacity-0"
+          "overflow-hidden transition-all duration-300 md:hidden",
+          isMobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
         )}
       >
-        <ul className="flex flex-col items-center gap-4 py-6">
+        <ul className="flex flex-col items-center gap-5 pt-2 pb-8">
           {navLinks.map((link: { label: string; href: string }) => (
             <li key={link.href}>
               <Link
@@ -91,11 +90,11 @@ export function Navbar() {
               </Link>
             </li>
           ))}
-          <li className="w-full px-10 flex flex-col gap-3 mt-4">
-            <Button variant="soft" size="md" href="/creator" onClick={() => setIsMobileMenuOpen(false)}>
+          <li className="w-full px-6 flex flex-col gap-3 mt-2">
+            <Button className="w-full flex justify-center py-3.5" variant="soft" size="md" href="/creator" onClick={() => setIsMobileMenuOpen(false)}>
               SAYA KONTEN KREATOR
             </Button>
-            <Button variant="primary" size="md" href="/umkm" onClick={() => setIsMobileMenuOpen(false)}>
+            <Button className="w-full flex justify-center py-3.5" variant="primary" size="md" href="/umkm" onClick={() => setIsMobileMenuOpen(false)}>
               SAYA PEMILIK UMKM
             </Button>
           </li>
