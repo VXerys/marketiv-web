@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
+import { ChatbotFab } from "@/components/features/chatbot/ChatbotFab";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -20,7 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${poppins.className} antialiased`}>{children}</body>
+      <body className={`${poppins.className} antialiased`}>
+        {children}
+        <ChatbotFab />
+      </body>
     </html>
   );
 }
