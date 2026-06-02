@@ -17,26 +17,26 @@ Marketiv memiliki dua ruang pengguna yang **WAJIB TERISOLASI** pada level routin
 
 | Ekosistem | Route | Target User | Karakteristik UI |
 |---|---|---|---|
-| 🏪 **UMKM** | `src/app/umkm/*` | Pemilik usaha mikro daerah | Super simpel, minimal interaksi, fokus efisiensi |
-| 🎨 **Kreator** | `src/app/creator/*` | Mikro-Kreator konten | Lebih interaktif, dashboard portofolio & penghasilan |
+| 🏪 **UMKM** | `src/app/dashboard/umkm/*` | Pemilik usaha mikro daerah | Super simpel, minimal interaksi, fokus efisiensi |
+| 🎨 **Kreator** | `src/app/dashboard/kreator/*` | Mikro-Kreator konten | Lebih interaktif, dashboard portofolio & penghasilan |
 
 ### 🚫 LARANGAN MUTLAK: Cross-Import Antar Ekosistem
 
 ```
-src/app/umkm/**     ←✕→     src/app/creator/**
+src/app/dashboard/umkm/**     ←✕→     src/app/dashboard/kreator/**
 ```
 
-- Komponen, hooks, state, atau logika bisnis di `src/app/umkm/` **DILARANG KERAS** di-import atau digunakan oleh komponen di `src/app/creator/`, dan **SEBALIKNYA**.
+- Komponen, hooks, state, atau logika bisnis di `src/app/dashboard/umkm/` **DILARANG KERAS** di-import atau digunakan oleh komponen di `src/app/dashboard/kreator/`, dan **SEBALIKNYA**.
 - Server Actions spesifik UMKM **TIDAK BOLEH** dipanggil dari halaman Kreator, dan sebaliknya.
 - Zustand store yang dibuat untuk UI UMKM **TIDAK BOLEH** diakses dari halaman Kreator, dan sebaliknya.
 
 ### ❌ Contoh Pelanggaran
 
 ```tsx
-// src/app/creator/dashboard/page.tsx
+// src/app/dashboard/kreator/page.tsx
 // ❌ DILARANG — mengimport komponen dari domain UMKM
-import { UmkmOrderForm } from "@/app/umkm/components/UmkmOrderForm";
-import { useUmkmStore } from "@/app/umkm/stores/umkmStore";
+import { UmkmOrderForm } from "@/app/dashboard/umkm/components/UmkmOrderForm";
+import { useUmkmStore } from "@/app/dashboard/umkm/stores/umkmStore";
 
 export default function CreatorDashboard() {
   // ❌ Menggunakan state UMKM di halaman Kreator
@@ -66,8 +66,8 @@ Komponen yang **boleh digunakan bersama** oleh kedua ekosistem **WAJIB** diletak
 
 ### 🚫 Yang DILARANG
 
-- **JANGAN** membuat komponen bersama langsung di dalam `src/app/umkm/` atau `src/app/creator/` lalu mengimportnya dari domain lain.
-- **JANGAN** membuat file utility di dalam route-specific folder (`src/app/umkm/utils/`) jika utility tersebut juga dibutuhkan di sisi Kreator — pindahkan ke `src/lib/`.
+- **JANGAN** membuat komponen bersama langsung di dalam `src/app/dashboard/umkm/` atau `src/app/dashboard/kreator/` lalu mengimportnya dari domain lain.
+- **JANGAN** membuat file utility di dalam route-specific folder (`src/app/dashboard/umkm/utils/`) jika utility tersebut juga dibutuhkan di sisi Kreator — pindahkan ke `src/lib/`.
 - **JANGAN** meletakkan shared types di dalam salah satu domain — selalu taruh di `src/types/`.
 
 ### ✅ Contoh Alur yang Benar
@@ -85,12 +85,12 @@ export function StatusBadge({ status }: StatusBadgeProps) {
 ```
 
 ```tsx
-// src/app/umkm/page.tsx — ✅ Import dari shared location
+// src/app/dashboard/umkm/page.tsx — ✅ Import dari shared location
 import { StatusBadge } from "@/components/ui/StatusBadge";
 ```
 
 ```tsx
-// src/app/creator/page.tsx — ✅ Import dari shared location yang SAMA
+// src/app/dashboard/kreator/page.tsx — ✅ Import dari shared location yang SAMA
 import { StatusBadge } from "@/components/ui/StatusBadge";
 ```
 

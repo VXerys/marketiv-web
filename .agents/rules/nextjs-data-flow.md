@@ -103,13 +103,13 @@ export function Navbar() {
 
 ### 🚫 DILARANG: Fetch Data Langsung di Client Component
 
-Client Component **TIDAK BOLEH** melakukan data fetching langsung ke database, Supabase, atau API eksternal. Ini melanggar prinsip keamanan dan arsitektur Next.js App Router.
+Client Component **TIDAK BOLEH** melakukan data fetching langsung ke database, Appwrite, atau API eksternal. Ini melanggar prinsip keamanan dan arsitektur Next.js App Router.
 
 ```tsx
 // ❌ DILARANG KERAS
 "use client";
 
-import { supabase } from "@/lib/supabase";
+import { databases } from "@/lib/appwrite";
 
 export function CampaignList() {
   const [campaigns, setCampaigns] = useState([]);
@@ -117,8 +117,8 @@ export function CampaignList() {
   useEffect(() => {
     // ❌ JANGAN PERNAH fetch data langsung dari Client Component
     const fetchData = async () => {
-      const { data } = await supabase.from("campaigns").select("*");
-      setCampaigns(data);
+      const { documents } = await databases.listDocuments(databaseId, collectionId);
+      setCampaigns(documents);
     };
     fetchData();
   }, []);
@@ -132,7 +132,7 @@ export function CampaignList() {
 #### Pola A: Server Component (Data Fetching Langsung) — **DIUTAMAKAN**
 
 ```tsx
-// src/app/umkm/page.tsx
+// src/app/dashboard/umkm/page.tsx
 // ✅ BENAR: Server Component langsung fetch data
 import { getCampaigns } from "@/lib/actions/campaign";
 import { CampaignGrid } from "@/components/features/dashboard/CampaignGrid";
@@ -153,7 +153,7 @@ export default async function UmkmDashboardPage() {
 export async function createCampaign(formData: FormData) {
   // Validasi & sanitasi data di server
   const title = formData.get("title") as string;
-  // Insert ke database via Supabase
+  // Insert ke database via Appwrite
   // Revalidate cache jika perlu
 }
 
@@ -166,7 +166,7 @@ export async function getCampaigns() {
 #### Pola C: Komposisi Server + Client (Untuk UI Interaktif yang Butuh Data)
 
 ```tsx
-// src/app/umkm/page.tsx (Server Component — parent)
+// src/app/dashboard/umkm/page.tsx (Server Component — parent)
 import { getCampaigns } from "@/lib/actions/campaign";
 import { CampaignFilter } from "@/components/features/dashboard/CampaignFilter";
 
@@ -219,7 +219,7 @@ Zustand di Marketiv **HANYA** digunakan untuk menyimpan **UI state yang bersifat
 
 Aturan data flow ini harus **mematuhi pemisahan Dual-Ecosystem** Marketiv:
 
-- **Data `/app/umkm/*`** tidak boleh di-fetch atau di-share oleh komponen di `/app/creator/*`, dan sebaliknya
+- **Data `/dashboard/umkm/*`** tidak boleh di-fetch atau di-share oleh komponen di `/dashboard/kreator/*`, dan sebaliknya
 - Server Actions untuk UMKM harus diletakkan terpisah dari Server Actions untuk Kreator jika domain logic-nya berbeda
 - Shared utilities (seperti `cn()`, formatter) tetap boleh dipakai bersama dari `src/lib/`
 

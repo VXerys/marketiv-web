@@ -146,11 +146,11 @@ export async function createCampaign(formData: FormData) {
   // ✅ Validasi & sanitasi di server
   if (!title || budget <= 0) throw new Error("Invalid input");
 
-  // ✅ Insert ke database via Supabase (server-side only)
-  // await supabase.from("campaigns").insert({ title, budget });
+  // ✅ Insert ke database via Appwrite (server-side only)
+  // await databases.createDocument(databaseId, collectionId, ID.unique(), { title, budget });
 
   // ✅ Revalidate halaman terkait
-  revalidatePath("/umkm");
+  revalidatePath("/dashboard/umkm");
 }
 ```
 
@@ -194,7 +194,7 @@ Sering kali sebuah halaman membutuhkan **data dari server** DAN **interaktivitas
 **Server Component** fetch data → kirim ke **Client Component** via props.
 
 ```tsx
-// src/app/umkm/page.tsx (SERVER — fetch data)
+// src/app/dashboard/umkm/page.tsx (SERVER — fetch data)
 import { getCampaigns } from "@/lib/actions/campaign";
 import { CampaignFilter } from "@/components/features/dashboard/CampaignFilter";
 
@@ -257,7 +257,7 @@ export function Sidebar({ children }: SidebarProps) {
 ```
 
 ```tsx
-// src/app/umkm/layout.tsx (SERVER — komposisi)
+// src/app/dashboard/umkm/layout.tsx (SERVER — komposisi)
 import { Sidebar } from "@/components/layouts/Sidebar";
 import { SidebarNav } from "@/components/layouts/SidebarNav"; // Server Component
 

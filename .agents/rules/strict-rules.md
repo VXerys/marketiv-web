@@ -20,7 +20,7 @@ You are an elite Software Development AI Assistant working on the **Marketiv** p
 - **Framework:** Next.js 16 (App Router) with React 19 and TypeScript 5
 - **Styling:** Tailwind CSS v4 via `@tailwindcss/postcss`, using `@theme` directive for design tokens in `globals.css`
 - **Utilities:** `clsx` + `tailwind-merge` via the `cn()` helper from `@/lib/utils`
-- **Font:** Poppins (loaded via `next/font/google` with variable `--font-poppins`)
+- **Font:** Plus Jakarta Sans (loaded via `next/font/google` with variable `--font-plus-jakarta-sans`)
 - **Path Alias:** `@/*` maps to `./src/*`
 
 ### Established Naming Conventions
@@ -64,11 +64,12 @@ The following folder structure is intentional and must be respected:
 ```
 src/
 ├── app/                    # Next.js App Router pages & layouts
-│   ├── layout.tsx          # Root layout (Poppins font, metadata)
+│   ├── layout.tsx          # Root layout (Plus Jakarta Sans font, metadata)
 │   ├── page.tsx            # Landing page
 │   ├── globals.css         # Tailwind v4 @theme tokens & utility classes
-│   ├── creator/page.tsx    # Creator dashboard page
-│   └── umkm/page.tsx       # UMKM dashboard page
+│   └── dashboard/          # Protected dashboard routes
+│       ├── kreator/page.tsx # Kreator dashboard page
+│       └── umkm/page.tsx    # UMKM dashboard page
 ├── assets/
 │   ├── icons/              # Raw SVG icon files
 │   └── images/             # Raster images (PNG, JPG, WebP) with barrel export (index.ts)

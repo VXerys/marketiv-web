@@ -9,8 +9,8 @@ Marketiv adalah platform marketplace hybrid yang menjembatani UMKM (terutama di 
 
 ## 2. THE DUAL-ECOSYSTEM (STRICT SEPARATION)
 Marketiv memiliki dua ruang pengguna yang terisolasi secara UI dan UX:
-- **Ruang UMKM (`/app/umkm/*`):** UI dirancang super simpel karena literasi digital UMKM daerah masih rendah. Fokus pada dashboard metrik pengeluaran dan pembuatan order.
-- **Ruang Kreator (`/app/creator/*`):** UI lebih interaktif untuk melihat daftar pekerjaan, portofolio, dan metrik penghasilan.
+- **Ruang UMKM (`/dashboard/umkm/*`):** UI dirancang super simpel karena literasi digital UMKM daerah masih rendah. Fokus pada dashboard metrik pengeluaran dan pembuatan order.
+- **Ruang Kreator (`/dashboard/kreator/*`):** UI lebih interaktif untuk melihat daftar pekerjaan, portofolio, dan metrik penghasilan.
 *Aturan Sistem:* Komponen/State UMKM tidak boleh bocor atau dipakai di halaman Kreator, dan sebaliknya.
 
 ## 3. CORE FEATURES (THE TWO MODES)
@@ -18,7 +18,7 @@ Marketiv memiliki dua ruang pengguna yang terisolasi secara UI dan UX:
 ### A. Campaign Mode (Viral / Performance-Based)
 Ini adalah layanan pemasaran pay-per-view.
 - **Logika Bisnis:** UMKM membuat brief (dibantu AI) & upload raw asset -> Kreator klaim job -> Kreator mengedit video -> **KREATOR POSTING DI AKUN SOSMED MEREKA SENDIRI**.
-- **RESTRICTION MUTLAK:** Dilarang keras ada fitur Chat/Komunikasi antara UMKM dan Kreator di mode ini. Ini untuk memotong birokrasi dan drama revisi.
+- **RESTRICTION MUTLAK:** Dilarang keras ada fitur Chat/Komunikasi antara UMKM and Kreator di mode ini. Ini untuk memotong birokrasi dan drama revisi.
 - **Pembayaran:** Berdasarkan jumlah views yang dicapai (Sistem mendeteksi fraud views).
 
 ### B. Rate Card Mode (Consultative / Influencer)
@@ -29,7 +29,7 @@ Ini adalah layanan premium berbayar tetap (fixed price).
 
 ## 4. TECH STACK & ARCHITECTURE ALIGNMENT
 - **Frontend:** Next.js 16 (App Router), React 19, Tailwind CSS v4, TypeScript 5.
-- **Backend (Headless):** Supabase (PostgreSQL) terintegrasi via Server Actions/Route Handlers.
+- **Backend (Headless):** Appwrite (Auth, Database, Storage, Functions, Realtime) terintegrasi via Server/Client SDK.
 - **State:** Zustand (khusus untuk client-side UI state, bukan untuk data dari database).
 
 ## 5. P2MW COMPLIANCE (BUSINESS GOALS)
