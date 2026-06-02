@@ -1,0 +1,17 @@
+animation:
+  - "src/components/**"
+  - "src/app/**"
+
+data:
+  - "src/lib/**"
+  - "src/data/**"
+
+docs:
+  - "docs/**"
+
+ui:
+  - "src/components/**"
+
+security:
+  - "package.json"
+  - ".github/**"

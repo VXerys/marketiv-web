@@ -134,8 +134,8 @@ Storage      : Supabase Storage (maks 100MB per file) + URL eksternal (Google Dr
 marketiv/
 ├── app/                          # Next.js App Router
 │   ├── (public)/                 # Route group: halaman publik (tanpa layout dashboard)
-│   │   ├── page.tsx              # Landing Page
 │   │   ├── tentang-kami/
+│   │   ├── page.tsx              # Landing Page
 │   │   ├── panduan/
 │   │   ├── login/
 │   │   └── register/

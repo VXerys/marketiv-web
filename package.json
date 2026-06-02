@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:unit": "vitest",
+    "test:e2e": "playwright test",
+    "animation-audit": "node scripts/animation-audit.js",
+    "validate-data-contracts": "node scripts/validate-data-contracts.js"
   },
   "dependencies": {
     "clsx": "^2.1.1",
