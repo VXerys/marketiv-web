@@ -3,6 +3,7 @@
 import { type MouseEvent, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { ChartBarData } from "@/types/umkmDashboard";
+import { DashboardCard } from "./DashboardCard";
 
 const TIME_RANGE_OPTIONS = ["7 Hari Terakhir", "30 Hari Terakhir"] as const;
 
@@ -47,7 +48,7 @@ export function UmkmViewsChartCard({ chartData }: UmkmViewsChartCardProps) {
   };
 
   return (
-    <div className="bento-card col-span-12 lg:col-span-7 relative group">
+    <DashboardCard className="col-span-12 lg:col-span-7 relative group">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-neutral-50/40 pointer-events-none rounded-2xl z-0"></div>
 
       <div className="flex justify-between items-center mb-8 relative z-20">
@@ -160,6 +161,6 @@ export function UmkmViewsChartCard({ chartData }: UmkmViewsChartCardProps) {
           </div>
         ))}
       </div>
-    </div>
+    </DashboardCard>
   );
 }
