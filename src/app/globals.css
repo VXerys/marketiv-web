@@ -1,4 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 @import "tailwindcss";
+
+:root {
+  --bg-main: #F7F3EE;
+  --bg-main-soft: #FAF8F5;
+  --bg-section: #FFFDF9;
+  --surface-card: #FFFDF9;
+  --surface-card-soft: #FAF8F5;
+  --surface-elevated: #FFFFFF;
+  --border-soft: rgba(28, 25, 23, 0.08);
+  --border-warm: rgba(120, 113, 108, 0.14);
+  --text-muted-warm: #78716C;
+  --text-soft-warm: #A8A29E;
+  --brand-orange-soft: #FFF3E8;
+  --navy-main: #020912;
+  --navy-soft: #061524;
+  --navy-card: #040e1b;
+}
 
 @theme {
   /* Font Family */
@@ -69,6 +87,19 @@
   --color-role-admin-bg: #faf5ff;
   --color-role-admin-text: #7e22ce;
   --color-role-admin-border: #e9d5ff;
+
+  /* Premium Warm Neutral Color Mappings */
+  --color-bg-main: var(--bg-main);
+  --color-bg-main-soft: var(--bg-main-soft);
+  --color-bg-section: var(--bg-section);
+  --color-surface-card: var(--surface-card);
+  --color-surface-card-soft: var(--surface-card-soft);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-border-soft: var(--border-soft);
+  --color-border-warm: var(--border-warm);
+  --color-navy-main: var(--navy-main);
+  --color-navy-soft: var(--navy-soft);
+  --color-navy-card: var(--navy-card);
 
   /* Background Tokens */
   --color-background: #fffdf9;
