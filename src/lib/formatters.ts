@@ -32,3 +32,25 @@ export function formatRelativeTime(value: string) {
   const diffDays = Math.floor(diffHours / 24);
   return `${diffDays} hari lalu`;
 }
+
+export function formatCompactCurrency(value: number): string {
+  if (value >= 1_000_000_000) {
+    const formatted = (value / 1_000_000_000).toLocaleString("id-ID", {
+      maximumFractionDigits: 1,
+    });
+    return `Rp ${formatted} M`;
+  }
+  if (value >= 1_000_000) {
+    const formatted = (value / 1_000_000).toLocaleString("id-ID", {
+      maximumFractionDigits: 1,
+    });
+    return `Rp ${formatted} jt`;
+  }
+  if (value >= 1_000) {
+    const formatted = (value / 1_000).toLocaleString("id-ID", {
+      maximumFractionDigits: 1,
+    });
+    return `Rp ${formatted} rb`;
+  }
+  return `Rp ${value}`;
+}

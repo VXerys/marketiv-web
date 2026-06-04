@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 type SidebarNavIcon = "dashboard" | "campaign" | "plus" | "users" | "chat" | "wallet";
@@ -7,16 +10,15 @@ interface SidebarNavItem {
   label: string;
   href: string;
   icon: SidebarNavIcon;
-  isActive?: boolean;
 }
 
 const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
-  { label: "Dashboard", href: "/dashboard/umkm", icon: "dashboard", isActive: true },
-  { label: "Campaign Saya", href: "#", icon: "campaign" },
-  { label: "Buat Campaign", href: "#", icon: "plus" },
-  { label: "Kreator", href: "#", icon: "users" },
-  { label: "Negosiasi", href: "#", icon: "chat" },
-  { label: "Keuangan", href: "#", icon: "wallet" },
+  { label: "Dashboard", href: "/dashboard/umkm", icon: "dashboard" },
+  { label: "Campaign Saya", href: "/dashboard/umkm/campaign", icon: "campaign" },
+  { label: "Buat Campaign", href: "/dashboard/umkm/campaign/buat", icon: "plus" },
+  { label: "Kreator", href: "/dashboard/umkm/kreator", icon: "users" },
+  { label: "Negosiasi", href: "/dashboard/umkm/negosiasi", icon: "chat" },
+  { label: "Keuangan", href: "/dashboard/umkm/keuangan", icon: "wallet" },
 ];
 
 interface DashboardSidebarProps {
@@ -79,6 +81,7 @@ export function DashboardSidebar({
   isSidebarOpen,
   onCloseSidebar,
 }: DashboardSidebarProps) {
+  const pathname = usePathname();
   return (
     <aside className={cn(
       "fixed left-0 top-0 h-screen w-[280px] sidebar-premium flex flex-col py-8 z-50 text-white transition-transform duration-300 ease-in-out lg:translate-x-0 lg:flex",
@@ -109,32 +112,35 @@ export function DashboardSidebar({
       {/* Navigation Items */}
       <nav className="flex-1 overflow-y-auto px-4">
         <ul className="space-y-1.5">
-          {SIDEBAR_NAV_ITEMS.map((item) => (
-            <li key={item.label}>
-              <Link
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 group",
-                  item.isActive
-                    ? "nav-item-active relative overflow-hidden"
-                    : "nav-item-inactive rounded-xl text-sm"
-                )}
-                href={item.href}
-              >
-                <span
-                  className={
-                    item.isActive
-                      ? "text-primary group-hover:scale-105 transition-transform duration-200"
-                      : "icon-container group-hover:scale-110 transition-all duration-200"
-                  }
+          {SIDEBAR_NAV_ITEMS.map((item) => {
+            const isActive = pathname === item.href || (item.href !== "/dashboard/umkm" && pathname.startsWith(item.href));
+            return (
+              <li key={item.label}>
+                <Link
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-3 group",
+                    isActive
+                      ? "nav-item-active relative overflow-hidden"
+                      : "nav-item-inactive rounded-xl text-sm"
+                  )}
+                  href={item.href}
                 >
-                  <SidebarIcon icon={item.icon} />
-                </span>
-                <span className={item.isActive ? "text-sm font-bold tracking-wide" : "font-semibold"}>
-                  {item.label}
-                </span>
-              </Link>
-            </li>
-          ))}
+                  <span
+                    className={
+                      isActive
+                        ? "text-primary group-hover:scale-105 transition-transform duration-200"
+                        : "icon-container group-hover:scale-110 transition-all duration-200"
+                    }
+                  >
+                    <SidebarIcon icon={item.icon} />
+                  </span>
+                  <span className={isActive ? "text-sm font-bold tracking-wide" : "font-semibold"}>
+                    {item.label}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
 

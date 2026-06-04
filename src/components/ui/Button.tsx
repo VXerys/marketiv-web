@@ -64,6 +64,8 @@ interface ButtonProps
     VariantProps<typeof buttonVariants> {
   /** When provided, renders as a next/link anchor. */
   href?: string;
+  target?: string;
+  rel?: string;
   children: React.ReactNode;
 }
 
