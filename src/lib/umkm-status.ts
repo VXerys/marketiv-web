@@ -11,15 +11,15 @@ export function getCampaignStatusLabel(status: CampaignStatus): string {
   return map[status] || status;
 }
 
-export function getCampaignStatusVariant(status: CampaignStatus): "secondary" | "success" | "warning" | "info" | "danger" {
-  const map: Record<CampaignStatus, "secondary" | "success" | "warning" | "info" | "danger"> = {
-    draft: "secondary",
+export function getCampaignStatusVariant(status: CampaignStatus): "neutral" | "success" | "warning" | "info" | "danger" {
+  const map: Record<CampaignStatus, "neutral" | "success" | "warning" | "info" | "danger"> = {
+    draft: "neutral",
     active: "success",
     full: "warning",
     completed: "info",
     cancelled: "danger",
   };
-  return map[status] || "secondary";
+  return map[status] || "neutral";
 }
 
 export function getSubmissionStatusLabel(status: SubmissionStatus): string {
@@ -32,14 +32,14 @@ export function getSubmissionStatusLabel(status: SubmissionStatus): string {
   return map[status] || status;
 }
 
-export function getSubmissionStatusVariant(status: SubmissionStatus): "secondary" | "success" | "warning" | "danger" {
-  const map: Record<SubmissionStatus, "secondary" | "success" | "warning" | "danger"> = {
+export function getSubmissionStatusVariant(status: SubmissionStatus): "neutral" | "success" | "warning" | "danger" {
+  const map: Record<SubmissionStatus, "neutral" | "success" | "warning" | "danger"> = {
     pending: "warning",
     valid: "success",
     fraud: "danger",
     dispute: "danger",
   };
-  return map[status] || "secondary";
+  return map[status] || "neutral";
 }
 
 export function getNegotiationStatusLabel(status: NegotiationOrder["status"]): string {
@@ -56,18 +56,18 @@ export function getNegotiationStatusLabel(status: NegotiationOrder["status"]): s
   return map[status] || status;
 }
 
-export function getNegotiationStatusVariant(status: NegotiationOrder["status"]): "secondary" | "success" | "warning" | "info" | "danger" {
-  const map: Record<NegotiationOrder["status"], "secondary" | "success" | "warning" | "info" | "danger"> = {
-    negotiation: "secondary",
+export function getNegotiationStatusVariant(status: NegotiationOrder["status"]): "neutral" | "success" | "warning" | "info" | "danger" {
+  const map: Record<NegotiationOrder["status"], "neutral" | "success" | "warning" | "info" | "danger"> = {
+    negotiation: "neutral",
     waiting_payment: "warning",
     escrow: "info",
     revision: "warning",
     waiting_verification: "warning",
     completed: "success",
-    cancelled: "secondary",
+    cancelled: "neutral",
     dispute: "danger",
   };
-  return map[status] || "secondary";
+  return map[status] || "neutral";
 }
 
 export function getTransactionStatusLabel(status: TransactionStatus): string {
@@ -81,13 +81,13 @@ export function getTransactionStatusLabel(status: TransactionStatus): string {
   return map[status] || status;
 }
 
-export function getTransactionStatusVariant(status: TransactionStatus): "secondary" | "success" | "warning" | "danger" {
-  const map: Record<TransactionStatus, "secondary" | "success" | "warning" | "danger"> = {
+export function getTransactionStatusVariant(status: TransactionStatus): "neutral" | "success" | "warning" | "danger" {
+  const map: Record<TransactionStatus, "neutral" | "success" | "warning" | "danger"> = {
     pending: "warning",
     escrow: "warning",
     success: "success",
     failed: "danger",
-    refunded: "secondary",
+    refunded: "neutral",
   };
-  return map[status] || "secondary";
+  return map[status] || "neutral";
 }
