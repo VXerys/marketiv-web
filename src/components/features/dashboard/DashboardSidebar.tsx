@@ -113,7 +113,12 @@ export function DashboardSidebar({
       <nav className="flex-1 overflow-y-auto px-4">
         <ul className="space-y-1.5">
           {SIDEBAR_NAV_ITEMS.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/dashboard/umkm" && pathname.startsWith(item.href));
+            const isActive =
+              item.href === "/dashboard/umkm"
+                ? pathname === "/dashboard/umkm"
+                : item.href === "/dashboard/umkm/campaign"
+                ? pathname.startsWith(item.href) && !pathname.startsWith("/dashboard/umkm/campaign/buat")
+                : pathname.startsWith(item.href);
             return (
               <li key={item.label}>
                 <Link

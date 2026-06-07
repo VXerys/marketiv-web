@@ -11,6 +11,8 @@ import {
   NegotiationOrder,
   ChatMessage,
   Transaction,
+  UmkmFinanceSummary,
+  EscrowOverview,
 } from "@/types/umkm-dashboard.types";
 import {
   mockUmkmProfile,
@@ -37,6 +39,9 @@ import {
   getNegotiationByIdFromAppwrite,
   getMessagesByOrderIdFromAppwrite,
   getTransactionsFromAppwrite,
+  getTransactionByIdFromAppwrite,
+  getFinanceSummaryFromAppwrite,
+  getEscrowOverviewFromAppwrite,
 } from "./umkm-appwrite.service";
 
 export async function getUmkmProfile(): Promise<ServiceResult<UmkmProfile>> {
@@ -157,4 +162,93 @@ export async function getTransactions(): Promise<ServiceResult<Transaction[]>> {
     return { success: true, data: mockTransactions };
   }
   return getTransactionsFromAppwrite();
+}
+
+export async function getTransactionById(id: string): Promise<ServiceResult<Transaction>> {
+  if (DATA_SOURCE_CONFIG.useMockData) {
+    await mockDelay(300);
+    const transaction = mockTransactions.find((tx) => tx.id === id);
+    if (!transaction) {
+      return { success: false, data: null, error: "Transaksi tidak ditemukan" };
+    }
+    return { success: true, data: transaction };
+  }
+  return getTransactionByIdFromAppwrite(id);
+}
+
+export async function getFinanceSummary(): Promise<ServiceResult<UmkmFinanceSummary>> {
+  if (DATA_SOURCE_CONFIG.useMockData) {
+    await mockDelay(300);
+    
+    // Total expenses: deposit + fee transactions that are success or escrow
+    const totalExpenses = mockTransactions
+      .filter((tx) => (tx.status === "success" || tx.status === "escrow") && (tx.type === "deposit" || tx.type === "fee"))
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const escrowBalance = mockTransactions
+      .filter((tx) => tx.status === "escrow")
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const pendingPayments = mockTransactions
+      .filter((tx) => tx.status === "pending")
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const refundsReceived = mockTransactions
+      .filter((tx) => tx.type === "refund" && tx.status === "refunded")
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const platformFees = mockTransactions
+      .filter((tx) => tx.type === "fee" && tx.status === "success")
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const successfulTransactionsCount = mockTransactions
+      .filter((tx) => tx.status === "success" || tx.status === "escrow" || tx.status === "refunded")
+      .length;
+
+    return {
+      success: true,
+      data: {
+        totalExpenses,
+        escrowBalance,
+        pendingPayments,
+        refundsReceived,
+        platformFees,
+        successfulTransactionsCount,
+      },
+    };
+  }
+  return getFinanceSummaryFromAppwrite();
+}
+
+export async function getEscrowOverview(): Promise<ServiceResult<EscrowOverview>> {
+  if (DATA_SOURCE_CONFIG.useMockData) {
+    await mockDelay(300);
+    
+    const activeEscrow = mockTransactions
+      .filter((tx) => tx.status === "escrow")
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const campaignEscrow = mockTransactions
+      .filter((tx) => tx.status === "escrow" && tx.referenceType === "campaign")
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const rateCardEscrow = mockTransactions
+      .filter((tx) => tx.status === "escrow" && tx.referenceType === "rate_card")
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const pendingRelease = rateCardEscrow; // Rate card custom offers pending verification / collab post URL
+    const refundEligible = campaignEscrow > 0 ? Math.min(campaignEscrow, 1200000) : 0; // Unused budget of campaign quota
+
+    return {
+      success: true,
+      data: {
+        activeEscrow,
+        pendingRelease,
+        refundEligible,
+        campaignEscrow,
+        rateCardEscrow,
+      },
+    };
+  }
+  return getEscrowOverviewFromAppwrite();
 }

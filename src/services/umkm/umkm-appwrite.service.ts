@@ -9,6 +9,8 @@ import {
   NegotiationOrder,
   ChatMessage,
   Transaction,
+  UmkmFinanceSummary,
+  EscrowOverview,
 } from "@/types/umkm-dashboard.types";
 
 export async function getUmkmProfileFromAppwrite(): Promise<ServiceResult<UmkmProfile>> {
@@ -74,4 +76,19 @@ export async function getMessagesByOrderIdFromAppwrite(orderId: string): Promise
 export async function getTransactionsFromAppwrite(): Promise<ServiceResult<Transaction[]>> {
   console.warn("Appwrite getTransactions is not implemented yet.");
   return { success: false, data: [], error: "Not implemented" };
+}
+
+export async function getTransactionByIdFromAppwrite(id: string): Promise<ServiceResult<Transaction>> {
+  console.warn(`Appwrite getTransactionById for ID ${id} is not implemented yet.`);
+  return { success: false, data: null, error: "Not implemented" };
+}
+
+export async function getFinanceSummaryFromAppwrite(): Promise<ServiceResult<UmkmFinanceSummary>> {
+  console.warn("Appwrite getFinanceSummary is not implemented yet.");
+  return { success: false, data: null, error: "Not implemented" };
+}
+
+export async function getEscrowOverviewFromAppwrite(): Promise<ServiceResult<EscrowOverview>> {
+  console.warn("Appwrite getEscrowOverview is not implemented yet.");
+  return { success: false, data: null, error: "Not implemented" };
 }

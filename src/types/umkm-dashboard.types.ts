@@ -180,3 +180,21 @@ export interface UmkmDashboardSummary {
   activeNegotiations: number;
   pendingPayments: number;
 }
+
+export interface UmkmFinanceSummary {
+  totalExpenses: number;
+  escrowBalance: number;
+  pendingPayments: number;
+  refundsReceived: number;
+  platformFees: number;
+  successfulTransactionsCount: number;
+}
+
+export interface EscrowOverview {
+  activeEscrow: number;
+  pendingRelease: number;
+  refundEligible: number;
+  campaignEscrow: number;
+  rateCardEscrow: number;
+}
+
