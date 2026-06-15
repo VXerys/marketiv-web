@@ -1,22 +1,47 @@
-import { Navbar } from "@/components/layouts/Navbar";
-import { DashboardHero } from "@/components/features/dashboard/DashboardHero";
-import { CampaignGrid } from "@/components/features/dashboard/CampaignGrid";
-import { dummyCampaigns } from "@/data/campaigns";
-import { CREATOR_CONTENT } from "@/data/content";
+import {
+  getCreatorProfile,
+  getCreatorMetrics,
+  getCreatorActiveWorks,
+  getCreatorNegotiations,
+  getCreatorActivities,
+  getCreatorJobs,
+} from "@/services/creator-dashboard.service";
+import { CreatorDashboardView } from "@/components/features/creator-dashboard";
 
-export default function CreatorPage() {
+export default async function CreatorPage() {
+  const [
+    profileRes,
+    metricsRes,
+    activeWorksRes,
+    negotiationsRes,
+    activitiesRes,
+    jobsRes,
+  ] = await Promise.all([
+    getCreatorProfile(),
+    getCreatorMetrics(),
+    getCreatorActiveWorks(),
+    getCreatorNegotiations(),
+    getCreatorActivities(),
+    getCreatorJobs(),
+  ]);
+
+  if (!profileRes.success || !profileRes.data || !metricsRes.success || !metricsRes.data) {
+    return (
+      <div className="p-8 text-center flex flex-col items-center justify-center min-h-[50vh]">
+        <h2 className="text-xl font-bold text-red-600">Gagal Memuat Dashboard</h2>
+        <p className="text-sm text-neutral-500 mt-2">Silakan hubungi dukungan atau coba beberapa saat lagi.</p>
+      </div>
+    );
+  }
+
   return (
-    <main className="bg-background min-h-screen">
-      <Navbar />
-      <DashboardHero
-        title={CREATOR_CONTENT.hero.title}
-        subtitle={CREATOR_CONTENT.hero.subtitle}
-        searchPlaceholder={CREATOR_CONTENT.hero.searchPlaceholder}
-      />
-      <CampaignGrid
-        title={CREATOR_CONTENT.grid.title}
-        campaigns={dummyCampaigns}
-      />
-    </main>
+    <CreatorDashboardView
+      profile={profileRes.data}
+      metrics={metricsRes.data}
+      activeWorks={activeWorksRes.data || []}
+      negotiations={negotiationsRes.data || []}
+      activities={activitiesRes.data || []}
+      recommendedJobs={jobsRes.data || []}
+    />
   );
 }
