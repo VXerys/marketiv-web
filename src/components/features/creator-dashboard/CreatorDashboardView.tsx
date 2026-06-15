@@ -123,12 +123,12 @@ export function CreatorDashboardView({
     const amountNum = Number(withdrawAmount);
 
     if (isNaN(amountNum) || amountNum <= 0) {
-      alert("Silakan masukkan nominal penarikan yang valid.");
+      showToast("Silakan masukkan nominal penarikan yang valid.");
       return;
     }
 
     if (amountNum > currentMetrics.balance) {
-      alert("Saldo wallet Anda tidak mencukupi.");
+      showToast("Saldo wallet Anda tidak mencukupi.");
       return;
     }
 
@@ -157,7 +157,7 @@ export function CreatorDashboardView({
   const handleProofSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedWorkToSubmit || !submitUrl.trim() || !submitUrl.startsWith("http")) {
-      alert("Silakan masukkan URL bukti tayang postingan sosial media yang valid.");
+      showToast("Silakan masukkan URL bukti tayang postingan sosial media yang valid.");
       return;
     }
 

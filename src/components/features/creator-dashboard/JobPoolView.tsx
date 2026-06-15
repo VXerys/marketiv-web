@@ -1,17 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { CreatorJob } from "@/types/creator-dashboard";
 import { CreatorPageHeader } from "./CreatorPageHeader";
 import { CreatorMetricCard } from "./CreatorMetricCard";
-import { CreatorStatusBadge } from "./CreatorStatusBadge";
 import { CreatorEmptyState } from "./CreatorEmptyState";
 import { CreatorErrorState } from "./CreatorErrorState";
-import { CreatorFilterToolbar } from "./CreatorFilterToolbar";
 import { CreatorCardSkeleton, CreatorMetricSkeleton } from "./CreatorSkeleton";
 import { formatCurrency } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
+import {
+  DashboardBadge,
+  DashboardButton,
+  DashboardProgress,
+  getDashboardCategoryTone,
+  getDashboardStatusTone,
+} from "@/components/features/dashboard/shared";
 
 interface JobPoolViewProps {
   initialJobs: CreatorJob[];
@@ -302,12 +308,12 @@ export function JobPoolView({ initialJobs }: JobPoolViewProps) {
               </select>
             </div>
 
-            <div className="flex items-center gap-3 shrink-0">
+            <div className="flex w-full flex-col gap-3 shrink-0 sm:flex-row sm:items-center md:w-auto">
               {/* Sort by */}
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-3.5 py-2.5 bg-neutral-50/50 border border-neutral-200/60 rounded-xl text-xs font-bold text-neutral-700 cursor-pointer focus:outline-none min-w-[140px]"
+                className="w-full min-w-0 rounded-xl border border-neutral-200/60 bg-neutral-50/50 px-3.5 py-2.5 text-xs font-bold text-neutral-700 cursor-pointer focus:outline-none sm:w-auto sm:min-w-[140px]"
               >
                 {sortOptions.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -318,7 +324,7 @@ export function JobPoolView({ initialJobs }: JobPoolViewProps) {
               <button
                 onClick={() => setFilterAvailableOnly(!filterAvailableOnly)}
                 className={cn(
-                  "px-3.5 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer",
+                  "w-full rounded-xl border px-3.5 py-2.5 text-xs font-bold transition-all cursor-pointer sm:w-auto",
                   filterAvailableOnly
                     ? "bg-primary text-white border-primary-600 shadow-sm"
                     : "bg-neutral-50/50 text-neutral-700 border-neutral-200/60 hover:bg-neutral-50"
@@ -330,7 +336,7 @@ export function JobPoolView({ initialJobs }: JobPoolViewProps) {
               {hasActiveFilters && (
                 <button
                   onClick={handleClearFilters}
-                  className="px-3 py-2 text-xs font-bold text-neutral-500 hover:text-neutral-900 flex items-center gap-1 cursor-pointer"
+                  className="flex w-full items-center justify-center gap-1 px-3 py-2 text-xs font-bold text-neutral-500 cursor-pointer hover:text-neutral-900 sm:w-auto"
                 >
                   Reset
                 </button>
@@ -376,10 +382,12 @@ export function JobPoolView({ initialJobs }: JobPoolViewProps) {
                       <div className="flex items-start gap-4 mb-4">
                         <div className="w-12 h-12 rounded-xl border border-neutral-200/30 overflow-hidden shrink-0 relative bg-neutral-50 flex items-center justify-center">
                           {job.brandAvatar ? (
-                            <img
+                            <Image
                               src={job.brandAvatar}
                               alt={job.brandName}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              fill
+                              sizes="48px"
+                              className="object-cover transition-transform duration-300 group-hover:scale-105"
                             />
                           ) : (
                             <span className="font-bold text-neutral-400">B</span>
@@ -394,10 +402,9 @@ export function JobPoolView({ initialJobs }: JobPoolViewProps) {
                           </p>
                         </div>
                         
-                        <CreatorStatusBadge
-                          status={isFull ? "Penuh" : isNearLimit ? "Hampir Penuh" : "Aktif"}
-                          type="campaign"
-                        />
+                        <DashboardBadge tone={getDashboardStatusTone(isFull ? "full" : isNearLimit ? "pending" : "active")} size="sm">
+                          {isFull ? "Penuh" : isNearLimit ? "Hampir Penuh" : "Aktif"}
+                        </DashboardBadge>
                       </div>
 
                       {/* Brief preview */}
@@ -407,31 +414,24 @@ export function JobPoolView({ initialJobs }: JobPoolViewProps) {
 
                       {/* Info badges */}
                       <div className="flex flex-wrap gap-2 mb-4">
-                        <span className="inline-flex px-2.5 py-0.5 rounded-full bg-primary-50 text-primary border border-primary-100/50 text-[9px] font-black uppercase tracking-wider">
+                        <DashboardBadge tone={getDashboardCategoryTone(job.niche)} size="sm" className="uppercase tracking-wider">
                           🎥 {job.niche}
-                        </span>
+                        </DashboardBadge>
                         {job.externalAssetUrl && (
-                          <span className="inline-flex px-2.5 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-100 text-[9px] font-black uppercase tracking-wider">
+                          <DashboardBadge tone="green" size="sm" className="uppercase tracking-wider">
                             📂 Aset Tersedia
-                          </span>
+                          </DashboardBadge>
                         )}
                       </div>
 
                       {/* Quota Progress Bar */}
-                      <div className="space-y-1.5 mb-4 border-t border-neutral-100 pt-3">
-                        <div className="flex justify-between items-center text-[10px] font-extrabold text-neutral-400">
-                          <span>KUOTA KREATOR</span>
-                          <span className="text-neutral-700">{job.usedQuota} / {job.quota} Klaim</span>
-                        </div>
-                        <div className="w-full h-2 bg-neutral-100 rounded-full overflow-hidden">
-                          <div
-                            className={cn(
-                              "h-full rounded-full transition-all duration-500",
-                              isFull ? "bg-red-500" : isNearLimit ? "bg-amber-500" : "bg-primary"
-                            )}
-                            style={{ width: `${percentQuotaUsed}%` }}
-                          ></div>
-                        </div>
+                      <div className="mb-4 border-t border-neutral-100 pt-3">
+                        <DashboardProgress
+                          value={percentQuotaUsed}
+                          label="KUOTA KREATOR"
+                          valueLabel={`${job.usedQuota} / ${job.quota} Klaim`}
+                          tone={isFull ? "red" : isNearLimit ? "yellow" : "orange"}
+                        />
                       </div>
 
                       {/* Details specs */}
@@ -453,24 +453,28 @@ export function JobPoolView({ initialJobs }: JobPoolViewProps) {
 
                     {/* Action buttons */}
                     <div className="mt-auto grid grid-cols-2 gap-2.5 pt-2">
-                      <Link
+                      <DashboardButton
                         href={`/dashboard/kreator/job-pool/${job.id}`}
-                        className="w-full text-center bg-neutral-100 hover:bg-neutral-200/80 text-neutral-800 font-extrabold text-xs py-3 rounded-xl transition-all border border-neutral-300/40"
+                        variant="outline"
+                        size="md"
+                        fullWidthOnMobile
+                        className="w-full rounded-xl border-neutral-300/40 bg-neutral-100 text-xs font-extrabold text-neutral-800 hover:bg-neutral-200/80"
                       >
                         Lihat Detail
-                      </Link>
-                      <button
+                      </DashboardButton>
+                      <DashboardButton
                         disabled={isFull}
                         onClick={() => openClaimModal(job)}
+                        variant="primary"
+                        size="md"
+                        fullWidthOnMobile
                         className={cn(
-                          "w-full text-center font-extrabold text-xs py-3 rounded-xl transition-all border shadow-sm cursor-pointer",
-                          isFull
-                            ? "bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed"
-                            : "bg-primary hover:bg-primary-600 text-white border-primary-600/10 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                          "w-full rounded-xl border-primary-600/10 text-xs font-extrabold shadow-sm hover:shadow-md",
+                          isFull && "border-neutral-200 bg-neutral-100 text-neutral-400 cursor-not-allowed hover:bg-neutral-100 hover:shadow-sm",
                         )}
                       >
                         {isFull ? "Kuota Penuh" : "Klaim Job"}
-                      </button>
+                      </DashboardButton>
                     </div>
                   </div>
                 );

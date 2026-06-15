@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { CampaignSubmission } from "@/types/umkm-dashboard.types";
 import { formatCurrency, formatDate, formatRelativeTime } from "@/lib/formatters";
 import { DashboardCard, DashboardButton, DashboardBadge } from "../../shared";
@@ -24,12 +25,14 @@ export function SubmissionDetailModal({
 
         {/* Creator Info Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="h-10 w-10 rounded-full overflow-hidden shrink-0 bg-neutral-200 border border-border-soft">
+          <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-border-soft bg-neutral-200">
             {submission.creatorAvatarUrl ? (
-              <img
+              <Image
                 src={submission.creatorAvatarUrl}
                 alt={submission.creatorName}
-                className="h-full w-full object-cover"
+                fill
+                sizes="40px"
+                className="object-cover"
               />
             ) : (
               <div className="h-full w-full flex items-center justify-center font-bold text-neutral-500 bg-neutral-100">

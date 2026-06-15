@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { CampaignSubmission, SubmissionStatus } from "@/types/umkm-dashboard.types";
 import { formatCurrency, formatCompactNumber } from "@/lib/formatters";
 import { DashboardCard, DashboardButton, DashboardBadge } from "../../shared";
@@ -35,12 +36,14 @@ export function ReviewSubmissionModal({
 
         {/* Creator Info */}
         <div className="flex items-center gap-3.5 mb-6 p-4 bg-neutral-50 rounded-xl border border-border-soft">
-          <div className="h-12 w-12 rounded-full overflow-hidden shrink-0 bg-neutral-200 border border-border-soft">
+          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-border-soft bg-neutral-200">
             {submission.creatorAvatarUrl ? (
-              <img
+              <Image
                 src={submission.creatorAvatarUrl}
                 alt={submission.creatorName}
-                className="h-full w-full object-cover"
+                fill
+                sizes="48px"
+                className="object-cover"
               />
             ) : (
               <div className="h-full w-full flex items-center justify-center font-bold text-neutral-500 bg-neutral-100">

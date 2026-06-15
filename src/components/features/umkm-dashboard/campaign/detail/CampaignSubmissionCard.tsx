@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { CampaignSubmission } from "@/types/umkm-dashboard.types";
 import { formatCurrency, formatCompactNumber } from "@/lib/formatters";
 import {
@@ -28,12 +29,14 @@ export function CampaignSubmissionCard({
       
       {/* Creator Info */}
       <div className="flex items-center gap-3.5 min-w-0 w-full md:w-auto">
-        <div className="h-10 w-10 rounded-full overflow-hidden shrink-0 bg-neutral-200 border border-border-soft">
+        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-border-soft bg-neutral-200">
           {submission.creatorAvatarUrl ? (
-            <img
+            <Image
               src={submission.creatorAvatarUrl}
               alt={submission.creatorName}
-              className="h-full w-full object-cover"
+              fill
+              sizes="40px"
+              className="object-cover"
             />
           ) : (
             <div className="h-full w-full flex items-center justify-center font-bold text-neutral-500 bg-neutral-100">

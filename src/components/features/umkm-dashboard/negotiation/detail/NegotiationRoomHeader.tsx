@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
+import { DashboardModal } from "@/components/features/dashboard/shared";
 import { formatCurrency } from "@/lib/formatters";
 import { NegotiationOrder } from "@/types/umkm-dashboard.types";
 import { cn } from "@/lib/utils";
@@ -13,6 +15,8 @@ interface NegotiationRoomHeaderProps {
 }
 
 export function NegotiationRoomHeader({ order, onSendOffer, onPay }: NegotiationRoomHeaderProps) {
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+
   // Status mapping
   const getStatusDetails = (status: string) => {
     switch (status) {
@@ -74,11 +78,7 @@ export function NegotiationRoomHeader({ order, onSendOffer, onPay }: Negotiation
       return (
         <button
           type="button"
-          onClick={() => {
-            // Simulated validation trigger
-            alert("Memvalidasi postingan Collab Post... Tautan postingan valid!");
-            window.location.reload();
-          }}
+          onClick={() => setIsVerificationModalOpen(true)}
           className="px-4 py-2 rounded-xl bg-success hover:bg-success-strong text-white text-xs font-bold transition-all duration-200 cursor-pointer shadow-xs border border-success hover:border-success-strong select-none"
         >
           Verifikasi Collab Post
@@ -142,6 +142,19 @@ export function NegotiationRoomHeader({ order, onSendOffer, onPay }: Negotiation
           {renderHeaderAction()}
         </div>
       </div>
+
+      <DashboardModal
+        isOpen={isVerificationModalOpen}
+        title="Verifikasi Collab Post"
+        description="Memvalidasi postingan Collab Post. Tautan postingan akan dianggap valid untuk simulasi dashboard ini."
+        confirmLabel="Verifikasi"
+        cancelLabel="Batal"
+        onClose={() => setIsVerificationModalOpen(false)}
+        onConfirm={() => {
+          setIsVerificationModalOpen(false);
+          window.location.reload();
+        }}
+      />
     </div>
   );
 }
