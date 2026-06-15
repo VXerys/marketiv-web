@@ -3,11 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { CreatorActiveWork } from "@/types/creator-dashboard";
-import { CreatorStatusBadge } from "./CreatorStatusBadge";
-import { CreatorEmptyState } from "./CreatorEmptyState";
-import { CreatorErrorState } from "./CreatorErrorState";
+import Image from "next/image";
 import { formatCurrency } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
+import { DashboardCard, DashboardBadge, DashboardModal, DashboardButton, DashboardStateCard } from "@/components/features/dashboard/shared";
 
 interface ActiveWorkDetailViewProps {
   work: CreatorActiveWork | null;
@@ -112,10 +111,14 @@ export function ActiveWorkDetailView({ work: initialWork, onRetry }: ActiveWorkD
             Matikan Mode Error
           </button>
         </div>
-        <CreatorErrorState
-          errorMsg="Simulator error diaktifkan pada halaman detail pekerjaan aktif."
-          onRetry={() => {
+        <DashboardStateCard
+          kind="error"
+          title="Terjadi Kesalahan"
+          description="Simulator error diaktifkan pada Halaman Detail Pekerjaan."
+          actionLabel="Coba Lagi"
+          onAction={() => {
             setIsErrorSimulated(false);
+            showToast("Berhasil memulihkan dari state error!");
             if (onRetry) onRetry();
           }}
         />
@@ -127,17 +130,12 @@ export function ActiveWorkDetailView({ work: initialWork, onRetry }: ActiveWorkD
   if (!work) {
     return (
       <div className="flex-1 p-4 sm:p-6 lg:p-8 flex flex-col justify-center items-center min-h-[70vh]">
-        <CreatorEmptyState
+        <DashboardStateCard
+          kind="empty"
           title="Pekerjaan tidak ditemukan"
           description="ID pekerjaan yang Anda cari tidak terdaftar atau telah dibatalkan."
-          actionButton={
-            <Link
-              href="/dashboard/kreator/pekerjaan-aktif"
-              className="bg-primary hover:bg-primary-600 text-white font-bold text-xs px-5 py-2.5 rounded-full transition-all shadow border border-primary-600/10"
-            >
-              Kembali ke Pekerjaan Aktif
-            </Link>
-          }
+          actionLabel="Kembali ke Pekerjaan Aktif"
+          onAction={() => { window.location.href = '/dashboard/kreator/pekerjaan-aktif'; }}
         />
       </div>
     );
@@ -218,17 +216,19 @@ export function ActiveWorkDetailView({ work: initialWork, onRetry }: ActiveWorkD
           </Link>
 
           {/* Work Header */}
-          <div className="bg-white/95 border border-neutral-200/50 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-8 shadow-sm">
+          <DashboardCard padding="lg" className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-8">
             <div className="flex items-center gap-4 min-w-0">
-              <div className="w-14 h-14 rounded-xl border border-neutral-200/30 overflow-hidden shrink-0 bg-neutral-50 flex items-center justify-center font-bold text-neutral-400">
+              <div className="relative w-14 h-14 rounded-xl border border-neutral-200/30 overflow-hidden shrink-0 bg-neutral-50">
                 {work.brandAvatar ? (
-                  <img
+                  <Image
                     src={work.brandAvatar}
                     alt={work.brandName}
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="56px"
+                    className="object-cover"
                   />
                 ) : (
-                  <span>B</span>
+                  <div className="flex h-full w-full items-center justify-center font-bold text-neutral-400">B</div>
                 )}
               </div>
               <div className="min-w-0">
@@ -242,12 +242,13 @@ export function ActiveWorkDetailView({ work: initialWork, onRetry }: ActiveWorkD
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
-              <CreatorStatusBadge
-                status={statusLabel}
-                type="claim"
+              <DashboardBadge
+                type="status"
+                value={statusLabel === 'Menunggu Validasi' ? 'pending' : statusLabel === 'Valid' ? 'valid' : statusLabel === 'Fraud' ? 'fraud' : statusLabel === 'Selesai' ? 'completed' : statusLabel === 'Belum Submit' ? 'open' : 'pending'}
+                size="sm"
               />
             </div>
-          </div>
+          </DashboardCard>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
@@ -255,7 +256,7 @@ export function ActiveWorkDetailView({ work: initialWork, onRetry }: ActiveWorkD
             <div className="lg:col-span-8 space-y-6">
               
               {/* Brief Summary */}
-              <div className="bg-white border border-neutral-200/50 shadow-sm rounded-3xl p-6 sm:p-8 space-y-6">
+              <DashboardCard padding="lg" className="space-y-6">
                 <h3 className="font-extrabold text-neutral-900 text-sm border-b border-neutral-100 pb-3 uppercase tracking-wider">
                   Brief Kampanye &amp; Detail Aset
                 </h3>
@@ -285,8 +286,8 @@ export function ActiveWorkDetailView({ work: initialWork, onRetry }: ActiveWorkD
                     </span>
                   </div>
                   <div className="p-3.5 bg-neutral-50 rounded-2xl border border-neutral-200/20 text-center">
-                    <span className="block text-[8px] font-bold text-neutral-400 uppercase tracking-wider">Upload Video</span>
-                    <span className="block text-[10px] font-black text-indigo-700 mt-1 uppercase">TIDAK PERLU</span>
+                    <span className="block text-[8px] font-bold text-neutral-400 uppercase tracking-wider">Bukti Tayang</span>
+                    <span className="block text-[10px] font-black text-indigo-700 mt-1 uppercase">URL PUBLIK</span>
                   </div>
                 </div>
 
@@ -304,11 +305,11 @@ export function ActiveWorkDetailView({ work: initialWork, onRetry }: ActiveWorkD
                     Buka Aset Drive
                   </a>
                 </div>
-              </div>
+              </DashboardCard>
 
               {/* Submit Form (Only if not submitted) */}
               {!isSubmitted ? (
-                <div className="bg-white border border-neutral-200/50 shadow-sm rounded-3xl p-6 sm:p-8 space-y-6">
+                <DashboardCard padding="lg" className="space-y-6">
                   <div>
                     <h3 className="font-extrabold text-neutral-900 text-sm border-b border-neutral-100 pb-3 uppercase tracking-wider">
                       Submit Bukti Tayang (Link URL)
@@ -413,12 +414,12 @@ export function ActiveWorkDetailView({ work: initialWork, onRetry }: ActiveWorkD
                       Kirim Bukti Postingan
                     </button>
                   </form>
-                </div>
+                </DashboardCard>
               ) : (
                 /* URL Preview details if submitted */
                 <div className="space-y-6">
                   {/* Submitted Content Preview Card */}
-                  <div className="bg-white border border-neutral-200/50 shadow-sm rounded-3xl p-6 sm:p-8 space-y-5">
+                  <DashboardCard padding="lg" className="space-y-5">
                     <h3 className="font-extrabold text-neutral-900 text-sm border-b border-neutral-100 pb-3 uppercase tracking-wider">
                       Detail Bukti Tayang Diajukan
                     </h3>
@@ -456,10 +457,10 @@ export function ActiveWorkDetailView({ work: initialWork, onRetry }: ActiveWorkD
                         <p className="leading-relaxed">{work.rejectedReason}</p>
                       </div>
                     )}
-                  </div>
+                  </DashboardCard>
 
                   {/* Estimation Card */}
-                  <div className="bg-white border border-neutral-200/50 shadow-sm rounded-3xl p-6 sm:p-8 space-y-6">
+                  <DashboardCard padding="lg" className="space-y-6">
                     <h3 className="font-extrabold text-neutral-900 text-sm border-b border-neutral-100 pb-3 uppercase tracking-wider">
                       Estimasi &amp; Data Views Tayangan
                     </h3>
@@ -488,7 +489,7 @@ export function ActiveWorkDetailView({ work: initialWork, onRetry }: ActiveWorkD
                     <div className="bg-indigo-50/20 border border-indigo-100 rounded-2xl p-4 text-[11px] text-indigo-950 font-bold leading-normal">
                       💡 Dana reward dihitung berkala berdasarkan data views video Anda di sosial media yang disinkronkan oleh sistem audit admin Marketiv.
                     </div>
-                  </div>
+                  </DashboardCard>
                 </div>
               )}
 
@@ -498,7 +499,7 @@ export function ActiveWorkDetailView({ work: initialWork, onRetry }: ActiveWorkD
             <div className="lg:col-span-4 space-y-6">
               
               {/* Timeline tracking */}
-              <div className="bg-white border border-neutral-200/50 shadow-sm rounded-3xl p-6 space-y-6">
+              <DashboardCard padding="md" className="space-y-6">
                 <h4 className="font-extrabold text-neutral-900 text-xs border-b border-neutral-100 pb-3 uppercase tracking-wider">
                   Timeline Progres Bukti
                 </h4>
@@ -566,7 +567,7 @@ export function ActiveWorkDetailView({ work: initialWork, onRetry }: ActiveWorkD
                     </div>
                   </div>
                 </div>
-              </div>
+              </DashboardCard>
 
               {/* Campaign Mode Domain Rule Notification */}
               <div className="bg-indigo-50/20 border border-indigo-200/30 rounded-3xl p-6 space-y-4">
@@ -596,73 +597,41 @@ export function ActiveWorkDetailView({ work: initialWork, onRetry }: ActiveWorkD
       )}
 
       {/* Confirmation Modal */}
-      {isConfirmOpen && (
-        <div className="fixed inset-0 bg-neutral-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-neutral-200/50 shadow-2xl p-6 sm:p-8 max-w-md w-full animate-in fade-in zoom-in-95 duration-300">
-            <h3 className="text-lg font-black text-neutral-900 leading-none mb-4">
-              Kirim Bukti Tayang?
-            </h3>
-            <p className="text-xs text-neutral-500 font-semibold leading-relaxed mb-6">
-              Anda akan mengirimkan URL postingan <span className="font-bold uppercase text-neutral-900">{platform}</span>. 
-              Pastikan postingan berstatus publik dan memuat produk sesuai brief. Tautan tidak dapat diubah setelah diajukan.
-            </p>
-
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setIsConfirmOpen(false)}
-                className="flex-1 py-3 border border-neutral-200 text-neutral-600 hover:bg-neutral-50 font-bold text-xs rounded-full transition-all cursor-pointer"
-              >
-                Kembali
-              </button>
-              <button
-                type="button"
-                onClick={executeSubmit}
-                className="flex-1 py-3 bg-primary hover:bg-primary-600 text-white font-bold text-xs rounded-full transition-all border border-primary-600/10 shadow-md cursor-pointer"
-              >
-                Ya, Kirim Sekarang
-              </button>
-            </div>
-          </div>
+      <DashboardModal
+        isOpen={isConfirmOpen}
+        title="Konfirmasi Pengiriman Bukti"
+        description={`Yakin ingin mengirim URL ${platform === 'tiktok' ? 'TikTok' : 'Instagram Reels'} berikut sebagai bukti tayang?`}
+        onClose={() => setIsConfirmOpen(false)}
+        confirmLabel="Ya, Kirim Bukti"
+        cancelLabel="Cek Ulang URL"
+        onConfirm={executeSubmit}
+      >
+        <div className="mt-3 bg-neutral-50 border border-neutral-200 rounded-2xl p-4 break-all text-xs font-semibold text-primary">
+          {contentUrl}
         </div>
-      )}
+      </DashboardModal>
 
       {/* Success Modal */}
-      {isSuccessOpen && (
-        <div className="fixed inset-0 bg-neutral-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-neutral-200/50 shadow-2xl p-6 sm:p-8 max-w-md w-full text-center animate-in fade-in zoom-in-95 duration-300">
-            <div className="w-16 h-16 rounded-full bg-green-50 border border-green-100 flex items-center justify-center text-green-500 mx-auto mb-5 shadow-sm">
-              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            
-            <h3 className="text-lg font-black text-neutral-900 mb-2 leading-none">
-              Bukti Berhasil Dikirim
-            </h3>
-            
-            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-xs mx-auto mb-6">
-              Postingan Anda telah berhasil diserahkan untuk diaudit. Data views dan estimasi reward akan di-update secara berkala.
-            </p>
-
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setIsSuccessOpen(false)}
-                className="flex-1 py-3 border border-neutral-200 text-neutral-700 hover:bg-neutral-50 font-bold text-xs rounded-full transition-all cursor-pointer"
-              >
-                Tutup
-              </button>
-              <Link
-                href="/dashboard/kreator/pekerjaan-aktif"
-                className="flex-1 py-3 text-center bg-primary hover:bg-primary-600 text-white font-bold text-xs rounded-full border border-primary-600/10 shadow transition-all hover:-translate-y-0.5 active:translate-y-0"
-              >
-                Kembali ke List
-              </Link>
-            </div>
+      <DashboardModal
+        isOpen={isSuccessOpen}
+        title="Bukti Tayang Berhasil Dikirim!"
+        description="Bukti tayang Anda sedang diverifikasi oleh admin. Anda akan mendapat notifikasi setelah proses selesai."
+        onClose={() => setIsSuccessOpen(false)}
+        footer={
+          <div className="flex gap-3 w-full">
+            <DashboardButton type="button" variant="outline" onClick={() => setIsSuccessOpen(false)} fullWidthOnMobile>Tutup</DashboardButton>
+            <DashboardButton type="button" variant="primary" onClick={() => { window.location.href = '/dashboard/kreator/pekerjaan-aktif'; }} fullWidthOnMobile>Kembali ke List</DashboardButton>
+          </div>
+        }
+      >
+        <div className="flex flex-col items-center text-center pt-2">
+          <div className="w-16 h-16 rounded-full bg-green-50 border border-green-100 flex items-center justify-center text-green-500 mx-auto mb-2">
+            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
         </div>
-      )}
+      </DashboardModal>
 
       {/* Loading overlay during simulation */}
       {isSubmitting && (

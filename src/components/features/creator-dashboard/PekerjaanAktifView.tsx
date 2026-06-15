@@ -4,11 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { CreatorActiveWork } from "@/types/creator-dashboard";
 import { CreatorPageHeader } from "./CreatorPageHeader";
-import { CreatorMetricCard } from "./CreatorMetricCard";
-import { CreatorStatusBadge } from "./CreatorStatusBadge";
-import { CreatorEmptyState } from "./CreatorEmptyState";
-import { CreatorErrorState } from "./CreatorErrorState";
-import { CreatorCardSkeleton, CreatorMetricSkeleton } from "./CreatorSkeleton";
+import { DashboardMetricCard, DashboardBadge, MarketplaceCard, DashboardStateCard } from "@/components/features/dashboard/shared";
 import { formatCurrency } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
@@ -121,11 +117,14 @@ export function PekerjaanAktifView({ initialWorks }: PekerjaanAktifViewProps) {
             Matikan Mode Error
           </button>
         </div>
-        <CreatorErrorState
-          errorMsg="Gagal memuat pekerjaan aktif Anda karena masalah koneksi database."
-          onRetry={() => {
+        <DashboardStateCard
+          kind="error"
+          title="Terjadi Kesalahan"
+          description="Simulator error diaktifkan pada Halaman Pekerjaan Aktif."
+          actionLabel="Coba Lagi"
+          onAction={() => {
             setIsErrorSimulated(false);
-            showToast("Data pekerjaan aktif berhasil dipulihkan!");
+            showToast("Berhasil memulihkan dari state error!");
           }}
         />
       </div>
@@ -183,10 +182,14 @@ export function PekerjaanAktifView({ initialWorks }: PekerjaanAktifViewProps) {
       </div>
 
       {isLoadingSimulated ? (
-        <div>
-          <CreatorMetricSkeleton />
-          <div className="h-10 bg-white border border-neutral-200/50 rounded-xl animate-pulse w-full mb-6"></div>
-          <CreatorCardSkeleton count={3} />
+        <div className="space-y-6 animate-pulse">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {[...Array(4)].map((_, i) => <div key={i} className="h-28 bg-neutral-100 rounded-3xl" />)}
+          </div>
+          <div className="h-14 bg-neutral-100 rounded-2xl" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(3)].map((_, i) => <div key={i} className="h-64 bg-neutral-100 rounded-3xl" />)}
+          </div>
         </div>
       ) : (
         <div>
@@ -198,41 +201,41 @@ export function PekerjaanAktifView({ initialWorks }: PekerjaanAktifViewProps) {
 
           {/* Summary Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-            <CreatorMetricCard
+            <DashboardMetricCard
               label="Belum Submit"
               value={countBelumSubmit}
-              helperText="Butuh posting bukti"
+              helper="Butuh posting bukti"
               icon={
                 <svg className="w-5 h-5 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               }
             />
-            <CreatorMetricCard
+            <DashboardMetricCard
               label="Menunggu Validasi"
               value={countPending}
-              helperText="Sedang diaudit"
-              variant="orange"
+              helper="Sedang diaudit"
+              tone="orange"
               icon={
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               }
             />
-            <CreatorMetricCard
+            <DashboardMetricCard
               label="Valid"
               value={countValid}
-              helperText="Reward siap cair"
+              helper="Reward siap cair"
               icon={
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               }
             />
-            <CreatorMetricCard
+            <DashboardMetricCard
               label="Perlu Review / Fraud"
               value={countReviewFraud}
-              helperText="Ada kendala konten"
+              helper="Ada kendala konten"
               icon={
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -309,30 +312,12 @@ export function PekerjaanAktifView({ initialWorks }: PekerjaanAktifViewProps) {
 
           {/* Grid Content */}
           {isEmptySimulated || filteredWorks.length === 0 ? (
-            <CreatorEmptyState
+            <DashboardStateCard
+              kind="empty"
               title="Belum ada pekerjaan aktif"
-              description={
-                isEmptySimulated
-                  ? "Kamu belum mengklaim campaign apa pun dari pool pekerjaan."
-                  : "Tidak ada pekerjaan aktif yang cocok dengan filter pencarianmu."
-              }
-              actionButton={
-                isEmptySimulated ? (
-                  <Link
-                    href="/dashboard/kreator/job-pool"
-                    className="bg-primary hover:bg-primary-600 text-white font-bold text-xs px-5 py-2.5 rounded-full transition-all border border-primary-600/10 shadow-md inline-block"
-                  >
-                    Cari Job di Job Pool
-                  </Link>
-                ) : (
-                  <button
-                    onClick={handleClearFilters}
-                    className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-bold text-xs px-5 py-2.5 rounded-full transition-all border border-neutral-300"
-                  >
-                    Reset Filter
-                  </button>
-                )
-              }
+              description={isEmptySimulated ? "Kamu belum mengklaim campaign apa pun dari pool pekerjaan." : "Tidak ada pekerjaan aktif yang cocok dengan filter pencarianmu."}
+              actionLabel={isEmptySimulated ? "Cari Job di Job Pool" : "Reset Filter"}
+              onAction={isEmptySimulated ? () => { window.location.href = '/dashboard/kreator/job-pool'; } : handleClearFilters}
             />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -350,111 +335,67 @@ export function PekerjaanAktifView({ initialWorks }: PekerjaanAktifViewProps) {
                 }
 
                 return (
-                  <div
+                  <MarketplaceCard
                     key={work.id}
-                    className="bg-white/95 border border-neutral-200/50 shadow-sm rounded-3xl p-6 hover:shadow-md transition-all flex flex-col justify-between h-full group"
-                  >
-                    <div>
-                      {/* Brand Info */}
-                      <div className="flex items-start gap-4 mb-4">
-                        <div className="w-12 h-12 rounded-xl border border-neutral-200/30 overflow-hidden shrink-0 bg-neutral-50 flex items-center justify-center">
-                          {work.brandAvatar ? (
-                            <img
-                              src={work.brandAvatar}
-                              alt={work.brandName}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <span className="font-bold text-neutral-400">B</span>
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <h4 className="font-extrabold text-neutral-900 group-hover:text-primary transition-colors text-sm truncate leading-tight">
-                            {work.title}
-                          </h4>
-                          <p className="text-[10px] font-bold text-neutral-400 mt-1 uppercase tracking-wider">
-                            {work.brandName}
-                          </p>
-                        </div>
-                        
-                        <CreatorStatusBadge
-                          status={subStatus}
-                          type="claim"
+                    kind="job"
+                    title={work.title}
+                    subtitle={work.brandName}
+                    image={work.brandAvatar ? { src: work.brandAvatar, alt: work.brandName } : undefined}
+                    badges={
+                      <>
+                        <DashboardBadge
+                          type="status"
+                          value={subStatus === 'Belum Submit' ? 'open' : subStatus === 'Menunggu Validasi' ? 'pending' : subStatus === 'Valid' || subStatus === 'Selesai' ? 'completed' : 'pending'}
+                          size="sm"
                         />
+                      </>
+                    }
+                    metrics={
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-2 gap-3 py-3 px-4 rounded-2xl bg-neutral-50 border border-neutral-200/20 text-xs font-semibold">
+                          <div>
+                            <span className="block text-[9px] font-bold text-neutral-400 uppercase tracking-wider">Deadline</span>
+                            <span className={cn("block font-black mt-0.5", days < 0 ? "text-red-500" : days <= 3 && !hasSubmitted ? "text-amber-600" : "text-neutral-900")}>{deadlineText}</span>
+                          </div>
+                          <div>
+                            <span className="block text-[9px] font-bold text-neutral-400 uppercase tracking-wider">{earningLabel}</span>
+                            <span className="block font-black text-neutral-900 mt-0.5">{formatCurrency(earningVal)}</span>
+                          </div>
+                        </div>
+                        {work.contentUrl && (
+                          <div className="bg-neutral-50/50 border border-neutral-100 rounded-xl p-3 flex items-center justify-between text-xs">
+                            <span className="font-extrabold text-[9px] text-neutral-400 uppercase tracking-wider">Link Bukti</span>
+                            <a href={work.contentUrl} target="_blank" rel="noreferrer" className="font-bold text-primary truncate max-w-[140px] hover:underline">{work.contentUrl}</a>
+                          </div>
+                        )}
+                        {work.submissionStatus === 'Fraud' && work.rejectedReason && (
+                          <div className="bg-red-50 border border-red-100 rounded-xl p-3 text-[10px] font-bold text-red-800">⚠️ {work.rejectedReason}</div>
+                        )}
                       </div>
-
-                      {/* Brief preview */}
-                      <p className="text-xs text-neutral-500 font-semibold leading-relaxed mb-4 line-clamp-2">
-                        {work.brief}
-                      </p>
-
-                      {/* Specs */}
-                      <div className="grid grid-cols-2 gap-3 py-3 px-4 rounded-2xl bg-neutral-50 border border-neutral-200/20 mb-4 text-xs font-semibold">
-                        <div>
-                          <span className="block text-[9px] font-bold text-neutral-400 uppercase tracking-wider">Deadline</span>
-                          <span
-                            className={cn(
-                              "block font-black mt-0.5",
-                              days < 0 ? "text-red-500" : days <= 3 && !hasSubmitted ? "text-amber-600" : "text-neutral-900"
-                            )}
-                          >
-                            {deadlineText}
-                          </span>
+                    }
+                    primaryAction={
+                      !hasSubmitted ? (
+                        <Link
+                          href={`/dashboard/kreator/pekerjaan-aktif/${work.id}`}
+                          className="w-full block text-center bg-primary hover:bg-primary-600 text-white font-extrabold text-xs py-3 rounded-xl transition-all border border-primary-600/10 shadow-sm"
+                        >
+                          Submit Bukti Tayang
+                        </Link>
+                      ) : (
+                        <div className="w-full flex items-center justify-center bg-neutral-50 border border-neutral-200/50 text-[10px] font-black uppercase text-neutral-400 rounded-xl py-3 tracking-wider select-none">
+                          Sudah Dikirim
                         </div>
-                        <div>
-                          <span className="block text-[9px] font-bold text-neutral-400 uppercase tracking-wider">{earningLabel}</span>
-                          <span className="block font-black text-neutral-900 mt-0.5">
-                            {formatCurrency(earningVal)}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* URL Preview if available */}
-                      {work.contentUrl && (
-                        <div className="bg-neutral-50/50 border border-neutral-100 rounded-xl p-3 mb-4 flex items-center justify-between text-xs">
-                          <span className="font-extrabold text-[9px] text-neutral-400 uppercase tracking-wider">Link Video</span>
-                          <a
-                            href={work.contentUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="font-bold text-primary truncate max-w-[180px] hover:underline"
-                          >
-                            {work.contentUrl}
-                          </a>
-                        </div>
-                      )}
-
-                      {/* Fraud alert if present */}
-                      {work.submissionStatus === "Fraud" && work.rejectedReason && (
-                        <div className="bg-red-50 border border-red-100 rounded-xl p-3 mb-4 text-[10px] font-bold text-red-800">
-                          ⚠️ {work.rejectedReason}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Actions */}
-                    <div className="grid grid-cols-2 gap-2 mt-auto pt-2">
+                      )
+                    }
+                    secondaryAction={
                       <Link
                         href={`/dashboard/kreator/pekerjaan-aktif/${work.id}`}
-                        className="w-full text-center bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-extrabold text-xs py-3 rounded-xl transition-all border border-neutral-300/40"
+                        className="w-full block text-center bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-extrabold text-xs py-3 rounded-xl transition-all border border-neutral-300/40"
                       >
                         Lihat Detail
                       </Link>
-                      
-                      {!hasSubmitted ? (
-                        <Link
-                          href={`/dashboard/kreator/pekerjaan-aktif/${work.id}`}
-                          className="w-full text-center bg-primary hover:bg-primary-600 text-white font-extrabold text-xs py-3 rounded-xl transition-all border border-primary-600/10 shadow-sm"
-                        >
-                          Submit Bukti
-                        </Link>
-                      ) : (
-                        <div className="w-full flex items-center justify-center bg-neutral-50 border border-neutral-200/50 text-[10px] font-black uppercase text-neutral-400 rounded-xl tracking-wider select-none text-center">
-                          Sudah Kirim
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                    }
+                  />
                 );
               })}
             </div>

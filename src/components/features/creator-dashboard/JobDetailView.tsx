@@ -1,13 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { CreatorJob } from "@/types/creator-dashboard";
-import { CreatorStatusBadge } from "./CreatorStatusBadge";
-import { CreatorEmptyState } from "./CreatorEmptyState";
-import { CreatorErrorState } from "./CreatorErrorState";
-import { formatCurrency } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
+import {
+  DashboardCard,
+  DashboardMetricCard,
+  DashboardBadge,
+  DashboardProgress,
+  DashboardModal,
+  DashboardButton,
+  DashboardStateCard,
+} from "@/components/features/dashboard/shared";
 
 interface JobDetailViewProps {
   job: CreatorJob | null;
@@ -30,13 +36,6 @@ export function JobDetailView({ job: initialJob, onRetry }: JobDetailViewProps) 
     retention: false,
     views: false,
   });
-
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
 
   const handleClaimSubmit = () => {
     if (!job) return;
@@ -61,9 +60,12 @@ export function JobDetailView({ job: initialJob, onRetry }: JobDetailViewProps) 
             Matikan Mode Error
           </button>
         </div>
-        <CreatorErrorState
-          errorMsg="Simulator error diaktifkan pada Halaman Detail."
-          onRetry={() => {
+        <DashboardStateCard
+          kind="error"
+          title="Terjadi Kesalahan"
+          description="Simulator error diaktifkan pada Halaman Detail."
+          actionLabel="Coba Lagi"
+          onAction={() => {
             setIsErrorSimulated(false);
             if (onRetry) onRetry();
           }}
@@ -76,17 +78,12 @@ export function JobDetailView({ job: initialJob, onRetry }: JobDetailViewProps) 
   if (!job) {
     return (
       <div className="flex-1 p-4 sm:p-6 lg:p-8 flex flex-col justify-center items-center min-h-[70vh]">
-        <CreatorEmptyState
+        <DashboardStateCard
+          kind="empty"
           title="Kampanye tidak ditemukan"
           description="ID kampanye yang Anda masukkan tidak valid atau kampanye telah dihapus oleh pengiklan UMKM."
-          actionButton={
-            <Link
-              href="/dashboard/kreator/job-pool"
-              className="bg-primary hover:bg-primary-600 text-white font-bold text-xs px-5 py-2.5 rounded-full transition-all shadow border border-primary-600/10"
-            >
-              Kembali ke Job Pool
-            </Link>
-          }
+          actionLabel="Kembali ke Job Pool"
+          onAction={() => { window.location.href = '/dashboard/kreator/job-pool'; }}
         />
       </div>
     );
@@ -98,16 +95,6 @@ export function JobDetailView({ job: initialJob, onRetry }: JobDetailViewProps) 
 
   return (
     <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto relative">
-      {/* Toast */}
-      {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 bg-neutral-900 text-white text-xs font-bold py-3 px-5 rounded-xl shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-300 flex items-center gap-2">
-          <svg className="w-4.5 h-4.5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
       {/* Simulator Control Panel */}
       <div className="mb-6 bg-white/70 backdrop-blur-md border border-neutral-200/50 p-4 rounded-2xl flex flex-wrap gap-4 items-center justify-between shadow-[0_4px_20px_rgba(0,0,0,0.01)] text-xs font-bold text-neutral-700 shrink-0">
         <div className="flex items-center gap-2 text-neutral-900">
@@ -159,17 +146,19 @@ export function JobDetailView({ job: initialJob, onRetry }: JobDetailViewProps) 
           </Link>
 
           {/* 2. Campaign Header */}
-          <div className="bg-white/90 border border-neutral-200/50 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-8 shadow-sm">
+          <DashboardCard padding="lg" className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-8">
             <div className="flex items-center gap-4 min-w-0">
-              <div className="w-16 h-16 rounded-2xl border border-neutral-200/40 overflow-hidden shrink-0 relative bg-neutral-50 flex items-center justify-center font-bold text-neutral-400">
+              <div className="relative w-16 h-16 rounded-2xl border border-neutral-200/40 overflow-hidden shrink-0 bg-neutral-50">
                 {job.brandAvatar ? (
-                  <img
+                  <Image
                     src={job.brandAvatar}
                     alt={job.brandName}
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="64px"
+                    className="object-cover"
                   />
                 ) : (
-                  <span>B</span>
+                  <div className="flex h-full w-full items-center justify-center font-bold text-neutral-400">B</div>
                 )}
               </div>
               <div className="min-w-0">
@@ -183,64 +172,30 @@ export function JobDetailView({ job: initialJob, onRetry }: JobDetailViewProps) 
             </div>
 
             <div className="flex gap-2 shrink-0">
-              <span className="inline-flex px-3 py-1 rounded-full bg-primary-50 text-primary border border-primary-100 text-[10px] font-extrabold uppercase tracking-wider">
-                🎥 {job.niche}
-              </span>
-              <CreatorStatusBadge
-                status={isFull ? "Penuh" : isNearLimit ? "Hampir Penuh" : "Aktif"}
-                type="campaign"
-              />
+              <DashboardBadge type="status" value={isFull ? 'full' : isNearLimit ? 'pending' : 'active'} size="sm" />
+              <DashboardBadge type="category" value={job.niche} size="sm" />
             </div>
-          </div>
+          </DashboardCard>
 
           {/* 3. Metric Overview */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-            <div className="bg-white border border-neutral-200/50 p-4.5 rounded-2xl shadow-sm text-center">
-              <span className="block text-[9px] font-bold text-neutral-400 uppercase tracking-wider">Rate per 1k views</span>
-              <span className="block text-sm font-black text-neutral-900 mt-1 truncate">
-                {formatCurrency(job.ratePerThousandViews)}
-              </span>
-            </div>
-            <div className="bg-white border border-neutral-200/50 p-4.5 rounded-2xl shadow-sm text-center">
-              <span className="block text-[9px] font-bold text-neutral-400 uppercase tracking-wider">Budget Escrow</span>
-              <span className="block text-sm font-black text-neutral-900 mt-1 truncate">
-                {formatCurrency(job.totalBudget)}
-              </span>
-            </div>
-            <div className="bg-white border border-neutral-200/50 p-4.5 rounded-2xl shadow-sm text-center">
-              <span className="block text-[9px] font-bold text-neutral-400 uppercase tracking-wider">Target Views</span>
-              <span className="block text-sm font-black text-neutral-900 mt-1 truncate">
-                {(job.targetViews || 50000).toLocaleString("id-ID")}
-              </span>
-            </div>
-            <div className="bg-white border border-neutral-200/50 p-4.5 rounded-2xl shadow-sm text-center">
-              <span className="block text-[9px] font-bold text-neutral-400 uppercase tracking-wider">Batas Waktu</span>
-              <span className="block text-sm font-black text-neutral-900 mt-1 truncate">
-                {new Date(job.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
-              </span>
-            </div>
-            <div className="bg-white border border-neutral-200/50 p-4.5 rounded-2xl shadow-sm text-center col-span-2 md:col-span-1">
-              <span className="block text-[9px] font-bold text-neutral-400 uppercase tracking-wider">Kuota Terisi</span>
-              <span className="block text-sm font-black text-neutral-900 mt-1 truncate">
-                {job.usedQuota} / {job.quota} Klaim
-              </span>
-            </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+            <DashboardMetricCard label="Rate / 1k Views" value={job.ratePerThousandViews} currency="compact" />
+            <DashboardMetricCard label="Budget Escrow" value={job.totalBudget} currency="compact" />
+            <DashboardMetricCard label="Target Views" value={(job.targetViews || 50000).toLocaleString('id-ID')} />
+            <DashboardMetricCard label="Batas Waktu" value={new Date(job.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} />
+            <DashboardMetricCard label="Kuota Terisi" value={`${job.usedQuota} / ${job.quota}`} />
           </div>
 
           {/* Progress bar of quota */}
-          <div className="bg-white border border-neutral-200/50 rounded-2xl p-4 mb-8 flex items-center justify-between gap-4">
-            <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider">Progress Kuota Pendaftaran</span>
-            <div className="flex-1 h-3.5 bg-neutral-100 rounded-full overflow-hidden">
-              <div
-                className={cn(
-                  "h-full rounded-full transition-all duration-500",
-                  isFull ? "bg-red-500" : isNearLimit ? "bg-amber-500" : "bg-primary"
-                )}
-                style={{ width: `${percentQuotaUsed}%` }}
-              ></div>
-            </div>
-            <span className="text-xs font-black text-neutral-900">{percentQuotaUsed}%</span>
-          </div>
+          <DashboardCard padding="sm" className="mb-8">
+            <DashboardProgress
+              value={job.usedQuota}
+              max={job.quota}
+              label="Progress Kuota Pendaftaran"
+              valueLabel={`${percentQuotaUsed}%`}
+              tone={isFull ? 'red' : isNearLimit ? 'yellow' : 'orange'}
+            />
+          </DashboardCard>
 
           {/* Grid Brief and Assets Panels */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -249,7 +204,7 @@ export function JobDetailView({ job: initialJob, onRetry }: JobDetailViewProps) 
             <div className="lg:col-span-8 space-y-6">
               
               {/* 4. Brief Section */}
-              <div className="bg-white border border-neutral-200/50 shadow-sm rounded-3xl p-6 sm:p-8 space-y-6">
+              <DashboardCard padding="lg" className="space-y-6">
                 <h3 className="font-extrabold text-neutral-900 text-sm border-b border-neutral-100 pb-3 uppercase tracking-wider">
                   Brief Pekerjaan &amp; Produk
                 </h3>
@@ -308,7 +263,7 @@ export function JobDetailView({ job: initialJob, onRetry }: JobDetailViewProps) 
                     {job.ctaInstruction || "Ajak penonton membeli produk brand UMKM."}
                   </p>
                 </div>
-              </div>
+              </DashboardCard>
 
             </div>
 
@@ -316,18 +271,14 @@ export function JobDetailView({ job: initialJob, onRetry }: JobDetailViewProps) 
             <div className="lg:col-span-4 space-y-6">
               
               {/* 5. Asset Section */}
-              <div className="bg-white border border-neutral-200/50 shadow-sm rounded-3xl p-6 space-y-5">
+              <DashboardCard padding="md" className="space-y-5">
                 <h4 className="font-extrabold text-neutral-900 text-xs border-b border-neutral-100 pb-3 uppercase tracking-wider">
                   Materi &amp; Aset Kreatif
                 </h4>
                 
                 {job.thumbnailUrl && (
-                  <div className="w-full h-44 rounded-2xl overflow-hidden relative border border-neutral-200/30">
-                    <img
-                      src={job.thumbnailUrl}
-                      alt="Thumbnail Produk"
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="relative w-full h-44 rounded-2xl overflow-hidden border border-neutral-200/30">
+                    <Image src={job.thumbnailUrl!} alt="Thumbnail Produk" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
                   </div>
                 )}
 
@@ -346,7 +297,7 @@ export function JobDetailView({ job: initialJob, onRetry }: JobDetailViewProps) 
                 ) : (
                   <p className="text-xs text-neutral-400 font-medium">Tidak ada aset eksternal terlampir.</p>
                 )}
-              </div>
+              </DashboardCard>
 
               {/* 6. Payment Rule Card */}
               <div className="bg-indigo-50/20 border border-indigo-200/30 rounded-3xl p-6 space-y-4">
@@ -398,146 +349,94 @@ export function JobDetailView({ job: initialJob, onRetry }: JobDetailViewProps) 
       )}
 
       {/* Claim Modal (Checklist) */}
-      {isClaimOpen && job && (
-        <div className="fixed inset-0 bg-neutral-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-neutral-200/50 shadow-2xl p-6 sm:p-8 max-w-md w-full animate-in fade-in zoom-in-95 duration-300">
-            <div className="flex justify-between items-start gap-4 mb-6">
-              <div>
-                <h3 className="text-lg font-black text-neutral-900 leading-none">
-                  Klaim Campaign Ini?
-                </h3>
-                <p className="text-xs text-neutral-400 font-bold mt-1.5 uppercase tracking-wide">
-                  {job.title}
-                </p>
-              </div>
-              <button
-                onClick={() => setIsClaimOpen(false)}
-                className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors cursor-pointer"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+      <DashboardModal
+        isOpen={isClaimOpen && !!job}
+        title="Klaim Campaign Ini?"
+        description={job?.title}
+        onClose={() => setIsClaimOpen(false)}
+        footer={
+          <div className="flex gap-3 w-full">
+            <DashboardButton type="button" variant="outline" onClick={() => setIsClaimOpen(false)} fullWidthOnMobile>Batal</DashboardButton>
+            <DashboardButton type="button" variant="primary" onClick={handleClaimSubmit} disabled={!(isRulesChecked.brief && isRulesChecked.privacy && isRulesChecked.retention && isRulesChecked.views)} fullWidthOnMobile>Klaim Sekarang</DashboardButton>
+          </div>
+        }
+      >
+        <div className="space-y-4 text-xs font-semibold text-neutral-700">
+          <p className="text-neutral-500 leading-relaxed font-medium">
+            Harap centang persetujuan di bawah sebelum mengambil kontrak pekerjaan:
+          </p>
 
-            <div className="space-y-4 text-xs font-semibold text-neutral-700">
-              <p className="text-neutral-500 leading-relaxed font-medium">
-                Harap centang persetujuan di bawah sebelum mengambil kontrak pekerjaan:
-              </p>
+          <div className="space-y-3 pt-2">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isRulesChecked.brief}
+                onChange={(e) => setIsRulesChecked({ ...isRulesChecked, brief: e.target.checked })}
+                className="mt-0.5 rounded border-neutral-300 text-primary focus:ring-primary/20 w-4 h-4 cursor-pointer"
+              />
+              <span className="leading-relaxed">
+                Saya mengerti video review produk harus mematuhi do&apos;s &amp; don&apos;ts yang tertera pada brief.
+              </span>
+            </label>
 
-              <div className="space-y-3 pt-2">
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isRulesChecked.brief}
-                    onChange={(e) => setIsRulesChecked({ ...isRulesChecked, brief: e.target.checked })}
-                    className="mt-0.5 rounded border-neutral-300 text-primary focus:ring-primary/20 w-4 h-4 cursor-pointer"
-                  />
-                  <span className="leading-relaxed">
-                    Saya mengerti video review produk harus mematuhi do&apos;s &amp; don&apos;ts yang tertera pada brief.
-                  </span>
-                </label>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isRulesChecked.privacy}
+                onChange={(e) => setIsRulesChecked({ ...isRulesChecked, privacy: e.target.checked })}
+                className="mt-0.5 rounded border-neutral-300 text-primary focus:ring-primary/20 w-4 h-4 cursor-pointer"
+              />
+              <span className="leading-relaxed">
+                Saya akan menayangkan video di akun sosial media pribadi saya dan melampirkan link URL postingan tayang tersebut.
+              </span>
+            </label>
 
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isRulesChecked.privacy}
-                    onChange={(e) => setIsRulesChecked({ ...isRulesChecked, privacy: e.target.checked })}
-                    className="mt-0.5 rounded border-neutral-300 text-primary focus:ring-primary/20 w-4 h-4 cursor-pointer"
-                  />
-                  <span className="leading-relaxed">
-                    Saya akan menayangkan video di akun sosial media pribadi saya dan melampirkan link URL postingan tayang tersebut.
-                  </span>
-                </label>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isRulesChecked.retention}
+                onChange={(e) => setIsRulesChecked({ ...isRulesChecked, retention: e.target.checked })}
+                className="mt-0.5 rounded border-neutral-300 text-primary focus:ring-primary/20 w-4 h-4 cursor-pointer"
+              />
+              <span className="leading-relaxed">
+                Saya setuju tidak menghapus postingan video selama minimal 30 hari sejak bukti tayang diajukan.
+              </span>
+            </label>
 
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isRulesChecked.retention}
-                    onChange={(e) => setIsRulesChecked({ ...isRulesChecked, retention: e.target.checked })}
-                    className="mt-0.5 rounded border-neutral-300 text-primary focus:ring-primary/20 w-4 h-4 cursor-pointer"
-                  />
-                  <span className="leading-relaxed">
-                    Saya setuju tidak menghapus postingan video selama minimal 30 hari sejak bukti tayang diajukan.
-                  </span>
-                </label>
-
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isRulesChecked.views}
-                    onChange={(e) => setIsRulesChecked({ ...isRulesChecked, views: e.target.checked })}
-                    className="mt-0.5 rounded border-neutral-300 text-primary focus:ring-primary/20 w-4 h-4 cursor-pointer"
-                  />
-                  <span className="leading-relaxed">
-                    Saya mengerti pembayaran reward dihitung secara proporsional berdasarkan views tayangan valid.
-                  </span>
-                </label>
-              </div>
-
-              <div className="pt-6 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsClaimOpen(false)}
-                  className="flex-1 py-3 border border-neutral-200 text-neutral-600 hover:bg-neutral-50 font-bold text-xs rounded-full transition-all cursor-pointer"
-                >
-                  Batal
-                </button>
-                <button
-                  type="button"
-                  onClick={handleClaimSubmit}
-                  disabled={!(isRulesChecked.brief && isRulesChecked.privacy && isRulesChecked.retention && isRulesChecked.views)}
-                  className={cn(
-                    "flex-1 py-3 font-bold text-xs rounded-full border transition-all shadow-md cursor-pointer",
-                    !(isRulesChecked.brief && isRulesChecked.privacy && isRulesChecked.retention && isRulesChecked.views)
-                      ? "bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed shadow-none"
-                      : "bg-primary hover:bg-primary-600 text-white border-primary-600/10 hover:-translate-y-0.5 active:translate-y-0"
-                  )}
-                >
-                  Klaim Sekarang
-                </button>
-              </div>
-            </div>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isRulesChecked.views}
+                onChange={(e) => setIsRulesChecked({ ...isRulesChecked, views: e.target.checked })}
+                className="mt-0.5 rounded border-neutral-300 text-primary focus:ring-primary/20 w-4 h-4 cursor-pointer"
+              />
+              <span className="leading-relaxed">
+                Saya mengerti pembayaran reward dihitung secara proporsional berdasarkan views tayangan valid.
+              </span>
+            </label>
           </div>
         </div>
-      )}
+      </DashboardModal>
 
       {/* Success Modal */}
-      {isSuccessOpen && (
-        <div className="fixed inset-0 bg-neutral-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-neutral-200/50 shadow-2xl p-6 sm:p-8 max-w-md w-full text-center animate-in fade-in zoom-in-95 duration-300">
-            <div className="w-16 h-16 rounded-full bg-green-50 border border-green-100 flex items-center justify-center text-green-500 mx-auto mb-5 shadow-sm">
-              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            
-            <h3 className="text-lg font-black text-neutral-900 mb-2 leading-none">
-              Campaign Berhasil Diklaim
-            </h3>
-            
-            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-xs mx-auto mb-6">
-              Pekerjaan ini telah ditambahkan ke dashboard pengerjaan Anda. Silakan persiapkan video Anda sesuai brief.
-            </p>
-
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setIsSuccessOpen(false)}
-                className="flex-1 py-3 border border-neutral-200 text-neutral-700 hover:bg-neutral-50 font-bold text-xs rounded-full transition-all cursor-pointer"
-              >
-                Tutup
-              </button>
-              <Link
-                href="/dashboard/kreator/pekerjaan-aktif"
-                className="flex-1 py-3 text-center bg-primary hover:bg-primary-600 text-white font-bold text-xs rounded-full border border-primary-600/10 shadow transition-all hover:-translate-y-0.5 active:translate-y-0"
-              >
-                Lihat Pekerjaan Aktif
-              </Link>
-            </div>
+      <DashboardModal
+        isOpen={isSuccessOpen}
+        title="Campaign Berhasil Diklaim"
+        description="Pekerjaan ini telah ditambahkan ke dashboard pengerjaan Anda. Silakan persiapkan video Anda sesuai brief."
+        onClose={() => setIsSuccessOpen(false)}
+        footer={
+          <div className="flex gap-3 w-full">
+            <DashboardButton type="button" variant="outline" onClick={() => setIsSuccessOpen(false)} fullWidthOnMobile>Tutup</DashboardButton>
+            <DashboardButton type="button" variant="primary" onClick={() => { window.location.href = '/dashboard/kreator/pekerjaan-aktif'; }} fullWidthOnMobile>Lihat Pekerjaan Aktif</DashboardButton>
+          </div>
+        }
+      >
+        <div className="flex flex-col items-center text-center pt-2">
+          <div className="w-16 h-16 rounded-full bg-green-50 border border-green-100 flex items-center justify-center text-green-500 mx-auto mb-2 shadow-sm">
+            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </div>
         </div>
-      )}
+      </DashboardModal>
     </div>
   );
 }

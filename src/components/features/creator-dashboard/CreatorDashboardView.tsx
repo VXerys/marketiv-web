@@ -13,13 +13,9 @@ import {
   CreatorActivity,
   CreatorJob,
 } from "@/types/creator-dashboard";
-import { CreatorPageHeader } from "./CreatorPageHeader";
-import { CreatorMetricCard } from "./CreatorMetricCard";
 import { CreatorActionCard } from "./CreatorActionCard";
-import { CreatorEmptyState } from "./CreatorEmptyState";
-import { CreatorErrorState } from "./CreatorErrorState";
-import { CreatorStatusBadge } from "./CreatorStatusBadge";
 import { CreatorMetricSkeleton, CreatorCardSkeleton, CreatorListSkeleton } from "./CreatorSkeleton";
+import { DashboardMetricCard, DashboardBadge, DashboardModal, DashboardButton, DashboardStateCard } from "@/components/features/dashboard/shared";
 import { formatCurrency } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
@@ -36,7 +32,6 @@ export function CreatorDashboardView({
   profile,
   metrics,
   activeWorks: initialActiveWorks,
-  negotiations,
   activities: initialActivities,
   recommendedJobs: initialRecommendedJobs,
 }: CreatorDashboardViewProps) {
@@ -73,7 +68,7 @@ export function CreatorDashboardView({
   };
 
   // Simulated handlers
-  const handleKlaimJob = (jobId: string, jobTitle: string, rewardRate: number) => {
+  const handleKlaimJob = (jobId: string, jobTitle: string) => {
     // 1. Move from recommended to active works
     const targetJob = recJobs.find(j => j.id === jobId);
     if (!targetJob) return;
@@ -236,9 +231,12 @@ export function CreatorDashboardView({
             Matikan Mode Error
           </button>
         </div>
-        <CreatorErrorState
-          errorMsg="Simulator error diaktifkan untuk memenuhi persyaratan Slicing DoD."
-          onRetry={() => {
+        <DashboardStateCard
+          kind="error"
+          title="Terjadi Kesalahan"
+          description="Simulator error diaktifkan untuk memenuhi persyaratan Slicing DoD."
+          actionLabel="Coba Lagi"
+          onAction={() => {
             setIsErrorSimulated(false);
             showToast("Berhasil memulihkan dari state error!");
           }}
@@ -344,9 +342,10 @@ export function CreatorDashboardView({
                 <h2 className="text-2xl lg:text-3xl font-black text-neutral-900 tracking-tight leading-none">
                   Halo, {profile.name}
                 </h2>
-                <CreatorStatusBadge
-                  status={profile.isVerified ? "Verified" : "Pending"}
-                  type="campaign"
+                <DashboardBadge
+                  type="status"
+                  value={profile.isVerified ? "active" : "pending"}
+                  size="sm"
                 />
               </div>
               <p className="text-sm text-neutral-500 font-semibold max-w-xl leading-relaxed">
@@ -371,63 +370,63 @@ export function CreatorDashboardView({
 
           {/* 2. Metric Cards Grid (2 cols mobile, 3 tablet, 4 desktop) */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-            <CreatorMetricCard
+            <DashboardMetricCard
               label="Job Tersedia"
               value={currentMetrics.availableJobsCount}
-              helperText="Kampanye pool"
+              helper="Kampanye pool"
               icon={
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 9.172V5L8 4z" />
                 </svg>
               }
             />
-            <CreatorMetricCard
+            <DashboardMetricCard
               label="Pekerjaan Aktif"
               value={currentMetrics.activeJobsCount}
-              helperText="Sedang dikerjakan"
+              helper="Sedang dikerjakan"
               icon={
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               }
             />
-            <CreatorMetricCard
+            <DashboardMetricCard
               label="Submission Pending"
               value={currentMetrics.pendingSubmissionsCount}
-              helperText="Menunggu audit admin"
+              helper="Menunggu audit admin"
               icon={
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               }
             />
-            <CreatorMetricCard
+            <DashboardMetricCard
               label="Saldo Tersedia"
               value={currentMetrics.balance}
-              isCurrency={true}
-              helperText="Tarik ke rekening bank"
-              variant="orange"
+              currency="compact"
+              helper="Tarik ke rekening bank"
+              tone="orange"
               icon={
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                 </svg>
               }
             />
-            <CreatorMetricCard
+            <DashboardMetricCard
               label="Pending Payout"
               value={currentMetrics.pendingPayouts}
-              isCurrency={true}
-              helperText="Proses verifikasi"
+              currency="compact"
+              helper="Proses verifikasi"
               icon={
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               }
             />
-            <CreatorMetricCard
+            <DashboardMetricCard
               label="Views Tervalidasi"
               value={currentMetrics.validatedViewsCount}
-              helperText="Total views valid"
+              helper="Total views valid"
               icon={
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -435,20 +434,20 @@ export function CreatorDashboardView({
                 </svg>
               }
             />
-            <CreatorMetricCard
+            <DashboardMetricCard
               label="Rate Card Aktif"
               value={currentMetrics.activeRateCardsCount}
-              helperText="Paket penawaran"
+              helper="Paket penawaran"
               icon={
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                 </svg>
               }
             />
-            <CreatorMetricCard
+            <DashboardMetricCard
               label="Order Negosiasi"
               value={currentMetrics.negotiationOrdersCount}
-              helperText="Rate Card orders"
+              helper="Rate Card orders"
               icon={
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -535,17 +534,12 @@ export function CreatorDashboardView({
                 </div>
 
                 {isEmptySimulated || recJobs.length === 0 ? (
-                  <CreatorEmptyState
+                  <DashboardStateCard
+                    kind="empty"
                     title="Tidak ada rekomendasi baru"
                     description="Seluruh kampanye yang sesuai dengan kualifikasi profil Anda telah diklaim. Silakan kunjungi Job Pool umum."
-                    actionButton={
-                      <Link
-                        href="/dashboard/kreator/job-pool"
-                        className="bg-primary hover:bg-primary-600 text-white font-bold text-xs px-5 py-2.5 rounded-full transition-all shadow border border-primary-600/10"
-                      >
-                        Buka Job Pool
-                      </Link>
-                    }
+                    actionLabel="Buka Job Pool"
+                    onAction={() => { window.location.href = '/dashboard/kreator/job-pool'; }}
                   />
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -580,7 +574,7 @@ export function CreatorDashboardView({
                                 Lihat Detail
                               </Link>
                               <button
-                                onClick={() => handleKlaimJob(job.id, job.title, job.ratePerThousandViews)}
+                                onClick={() => handleKlaimJob(job.id, job.title)}
                                 className="w-full text-center bg-primary hover:bg-primary-600 text-white font-bold text-xs py-2.5 rounded-xl transition-all border border-primary-600/10 shadow-sm cursor-pointer"
                               >
                                 Klaim Job
@@ -609,17 +603,14 @@ export function CreatorDashboardView({
                 </div>
 
                 {activeWorks.length === 0 ? (
-                  <CreatorEmptyState
+                  <DashboardStateCard
+                    kind="empty"
                     title="Tidak ada pekerjaan berjalan"
                     description="Saat ini Anda tidak memiliki kampanye aktif yang sedang dikerjakan. Klaim job di atas untuk memulai."
                   />
                 ) : (
                   <div className="space-y-4">
                     {activeWorks.slice(0, 2).map((work) => {
-                      const isPending = work.submissionStatus === "Pending";
-                      const isCompleted = work.submissionStatus === "Valid";
-                      const isDisputed = work.submissionStatus === "Dispute";
-                      
                       const showSubmitBtn = !work.contentUrl && work.status === "Aktif";
 
                       return (
@@ -652,9 +643,10 @@ export function CreatorDashboardView({
                           </div>
 
                           <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto justify-between sm:justify-start">
-                            <CreatorStatusBadge
-                              status={work.submissionStatus || work.status}
-                              type="claim"
+                            <DashboardBadge
+                              type="status"
+                              value={String(work.submissionStatus || work.status)}
+                              size="sm"
                             />
                             {showSubmitBtn && (
                               <button
@@ -749,187 +741,139 @@ export function CreatorDashboardView({
       )}
 
       {/* Tarik Dana Modal */}
-      {isTarikDanaOpen && (
-        <div className="fixed inset-0 bg-neutral-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-neutral-200/50 shadow-2xl p-6 sm:p-8 max-w-md w-full animate-in fade-in zoom-in-95 duration-300">
-            <div className="flex justify-between items-start gap-4 mb-6">
-              <div>
-                <h3 className="text-lg font-black text-neutral-900 leading-none">
-                  Tarik Saldo Wallet
-                </h3>
-                <p className="text-xs text-neutral-400 font-bold mt-1.5 uppercase tracking-wide">
-                  Tersedia: {formatCurrency(currentMetrics.balance)}
-                </p>
-              </div>
-              <button
-                onClick={() => setIsTarikDanaOpen(false)}
-                className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors cursor-pointer"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <form onSubmit={handleWithdrawalSubmit} className="space-y-4">
-              <div className="space-y-1">
-                <label className="block text-[10px] font-bold text-neutral-600 uppercase tracking-wider">Pilih Bank</label>
-                <select
-                  value={bankName}
-                  onChange={(e) => setBankName(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-bold text-neutral-700 cursor-pointer focus:outline-none"
-                >
-                  <option value="bca">Bank BCA</option>
-                  <option value="mandiri">Bank Mandiri</option>
-                  <option value="bni">Bank BNI</option>
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <label className="block text-[10px] font-bold text-neutral-600 uppercase tracking-wider">Nomor Rekening</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Masukkan nomor rekening..."
-                  value={accountNumber}
-                  onChange={(e) => setAccountNumber(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-semibold text-neutral-800"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="block text-[10px] font-bold text-neutral-600 uppercase tracking-wider">Nama Pemilik Rekening</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Sesuai nama rekening tabungan..."
-                  value={accountHolder}
-                  onChange={(e) => setAccountHolder(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-semibold text-neutral-800"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="block text-[10px] font-bold text-neutral-600 uppercase tracking-wider">Nominal Penarikan</label>
-                <input
-                  type="number"
-                  required
-                  min={50000}
-                  max={currentMetrics.balance}
-                  placeholder="Rp..."
-                  value={withdrawAmount}
-                  onChange={(e) => setWithdrawAmount(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-semibold text-neutral-800"
-                />
-              </div>
-
-              <div className="pt-4 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsTarikDanaOpen(false)}
-                  className="flex-1 py-3 border border-neutral-200 text-neutral-600 hover:bg-neutral-50 font-bold text-xs rounded-full transition-all cursor-pointer"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-3 bg-primary hover:bg-primary-600 text-white font-bold text-xs rounded-full transition-all border border-primary-600/10 shadow-md cursor-pointer"
-                >
-                  Ajukan Penarikan
-                </button>
-              </div>
-            </form>
+      <DashboardModal
+        isOpen={isTarikDanaOpen}
+        title="Tarik Saldo Wallet"
+        description={`Saldo tersedia: ${formatCurrency(currentMetrics.balance)}`}
+        onClose={() => setIsTarikDanaOpen(false)}
+        footer={
+          <div className="flex gap-3 w-full">
+            <DashboardButton type="button" variant="outline" onClick={() => setIsTarikDanaOpen(false)} fullWidthOnMobile>
+              Batal
+            </DashboardButton>
+            <DashboardButton type="submit" form="tarik-dana-form" variant="primary" fullWidthOnMobile>
+              Ajukan Penarikan
+            </DashboardButton>
           </div>
-        </div>
-      )}
+        }
+      >
+        <form id="tarik-dana-form" onSubmit={handleWithdrawalSubmit} className="space-y-4">
+          <div className="space-y-1">
+            <label className="block text-[10px] font-bold text-neutral-600 uppercase tracking-wider">Pilih Bank</label>
+            <select
+              value={bankName}
+              onChange={(e) => setBankName(e.target.value)}
+              className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-bold text-neutral-700 cursor-pointer focus:outline-none"
+            >
+              <option value="bca">Bank BCA</option>
+              <option value="mandiri">Bank Mandiri</option>
+              <option value="bni">Bank BNI</option>
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-[10px] font-bold text-neutral-600 uppercase tracking-wider">Nomor Rekening</label>
+            <input
+              type="text"
+              required
+              placeholder="Masukkan nomor rekening..."
+              value={accountNumber}
+              onChange={(e) => setAccountNumber(e.target.value)}
+              className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-semibold text-neutral-800"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-[10px] font-bold text-neutral-600 uppercase tracking-wider">Nama Pemilik Rekening</label>
+            <input
+              type="text"
+              required
+              placeholder="Sesuai nama rekening tabungan..."
+              value={accountHolder}
+              onChange={(e) => setAccountHolder(e.target.value)}
+              className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-semibold text-neutral-800"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-[10px] font-bold text-neutral-600 uppercase tracking-wider">Nominal Penarikan</label>
+            <input
+              type="number"
+              required
+              min={50000}
+              max={currentMetrics.balance}
+              placeholder="Rp..."
+              value={withdrawAmount}
+              onChange={(e) => setWithdrawAmount(e.target.value)}
+              className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-semibold text-neutral-800"
+            />
+          </div>
+        </form>
+      </DashboardModal>
 
       {/* Submit Proof Modal */}
-      {isSubmitBuktiOpen && selectedWorkToSubmit && (
-        <div className="fixed inset-0 bg-neutral-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-neutral-200/50 shadow-2xl p-6 sm:p-8 max-w-md w-full animate-in fade-in zoom-in-95 duration-300">
-            <div className="flex justify-between items-start gap-4 mb-6">
-              <div>
-                <h3 className="text-lg font-black text-neutral-900 leading-none">
-                  Kirim Bukti Tayang
-                </h3>
-                <p className="text-xs text-neutral-400 font-bold mt-1.5 uppercase tracking-wide">
-                  {selectedWorkToSubmit.title}
-                </p>
-              </div>
+      <DashboardModal
+        isOpen={isSubmitBuktiOpen && !!selectedWorkToSubmit}
+        title="Kirim Bukti Tayang"
+        description={selectedWorkToSubmit?.title}
+        onClose={() => setIsSubmitBuktiOpen(false)}
+        footer={
+          <div className="flex gap-3 w-full">
+            <DashboardButton type="button" variant="outline" onClick={() => setIsSubmitBuktiOpen(false)} fullWidthOnMobile>
+              Batal
+            </DashboardButton>
+            <DashboardButton type="submit" form="submit-bukti-form" variant="primary" fullWidthOnMobile>
+              Kirim Bukti Tayang
+            </DashboardButton>
+          </div>
+        }
+      >
+        <form id="submit-bukti-form" onSubmit={handleProofSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-neutral-600 uppercase tracking-wider">
+              Platform
+            </label>
+            <div className="grid grid-cols-2 gap-3">
               <button
-                onClick={() => setIsSubmitBuktiOpen(false)}
-                className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors cursor-pointer"
+                type="button"
+                onClick={() => setSubmitPlatform("tiktok")}
+                className={cn(
+                  "py-2.5 rounded-xl border font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer",
+                  submitPlatform === "tiktok"
+                    ? "bg-neutral-900 text-white border-neutral-900 shadow-sm"
+                    : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
+                )}
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                TikTok
+              </button>
+              <button
+                type="button"
+                onClick={() => setSubmitPlatform("instagram")}
+                className={cn(
+                  "py-2.5 rounded-xl border font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer",
+                  submitPlatform === "instagram"
+                    ? "bg-neutral-900 text-white border-neutral-900 shadow-sm"
+                    : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
+                )}
+              >
+                Instagram
               </button>
             </div>
-
-            <form onSubmit={handleProofSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-neutral-600 uppercase tracking-wider">
-                  Platform
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setSubmitPlatform("tiktok")}
-                    className={cn(
-                      "py-2.5 rounded-xl border font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer",
-                      submitPlatform === "tiktok"
-                        ? "bg-neutral-900 text-white border-neutral-900 shadow-sm"
-                        : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
-                    )}
-                  >
-                    TikTok
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSubmitPlatform("instagram")}
-                    className={cn(
-                      "py-2.5 rounded-xl border font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer",
-                      submitPlatform === "instagram"
-                        ? "bg-neutral-900 text-white border-neutral-900 shadow-sm"
-                        : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
-                    )}
-                  >
-                    Instagram
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="block text-[10px] font-bold text-neutral-600 uppercase tracking-wider">Tautan URL Video Tayang</label>
-                <input
-                  type="url"
-                  required
-                  placeholder="https://tiktok.com/@username/video/..."
-                  value={submitUrl}
-                  onChange={(e) => setSubmitUrl(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-semibold text-neutral-800 placeholder-neutral-400"
-                />
-              </div>
-
-              <div className="pt-4 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsSubmitBuktiOpen(false)}
-                  className="flex-1 py-3 border border-neutral-200 text-neutral-600 hover:bg-neutral-50 font-bold text-xs rounded-full transition-all cursor-pointer"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-3 bg-primary hover:bg-primary-600 text-white font-bold text-xs rounded-full transition-all border border-primary-600/10 shadow-md cursor-pointer"
-                >
-                  Unggah Bukti
-                </button>
-              </div>
-            </form>
           </div>
-        </div>
-      )}
+
+          <div className="space-y-1">
+            <label className="block text-[10px] font-bold text-neutral-600 uppercase tracking-wider">Tautan URL Video Tayang</label>
+            <input
+              type="url"
+              required
+              placeholder="https://tiktok.com/@username/video/..."
+              value={submitUrl}
+              onChange={(e) => setSubmitUrl(e.target.value)}
+              className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-semibold text-neutral-800 placeholder-neutral-400"
+            />
+          </div>
+        </form>
+      </DashboardModal>
     </div>
   );
 }
