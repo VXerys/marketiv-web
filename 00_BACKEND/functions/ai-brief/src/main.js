@@ -101,6 +101,9 @@ export default async ({ req, res, log, error }) => {
   }
 
   const env = { ...process.env, ...(req.variables || {}) };
+  const databaseId =
+    env.NEXT_PUBLIC_DB_ID ||
+    env.APPWRITE_DATABASE_ID;
 
   try {
     const {
@@ -202,7 +205,7 @@ Return a JSON object with this exact structure (no markdown, no code fences, raw
       const databases = new Databases(client);
 
       await databases.createDocument(
-        env.APPWRITE_DATABASE_ID,
+        databaseId,
         "ai_requests",
         "unique()",
         {
@@ -215,15 +218,14 @@ Return a JSON object with this exact structure (no markdown, no code fences, raw
 
       if (campaignId) {
         const briefCollectionId = env.CAMPAIGN_BRIEFS_COLLECTION_ID || "campaign_briefs";
-        const dbId = env.APPWRITE_DATABASE_ID;
         try {
-          const existing = await databases.listDocuments(dbId, briefCollectionId, [
+          const existing = await databases.listDocuments(databaseId, briefCollectionId, [
             (await import("node-appwrite")).Query.equal("campaignId", campaignId),
             (await import("node-appwrite")).Query.limit(1)
           ]);
           if (existing.documents.length === 0) {
             await databases.createDocument(
-              dbId, briefCollectionId, "unique()",
+              databaseId, briefCollectionId, "unique()",
               {
                 campaignId,
                 objective: brief.objective || "",
